@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Lists Tool</title>
+  <link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml" />
+	<link rel="stylesheet" type="text/css" href="Lists.css" />
+	<script src="Lists.js"></script>
+</head>
+
+<body onload="countLinesX('ListA_ListB_List1_List2_List3')">
+<h3 class="Header">Lists Tool</h3>
+<!-- Input Lists -->
+<div class="table"><div class="tr">
+<div class="td">
+  <input type="button" value="List A" onclick="ListA.value=''" class="ButtonAsText">
+  <input type="text" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+  <span id=CounterListA></span> <br />
+  <textarea id="ListA" cols="38" rows="10" onkeyup="countLines('ListA')" onchange="countLines('ListA')"></textarea> &nbsp; &nbsp; <br />
+</div>
+<div class="td">
+  <input type="button" value="List B" onclick="ListB.value=''" class="ButtonAsText">
+  <input type="text" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+  <span id=CounterListB></span> <br />
+  <textarea id="ListB" cols="38" rows="10" onkeyup="countLines('ListB')" onchange="countLines('ListB')"></textarea><br />
+</div></div></div>
+<br />
+<!-- Action -->
+<div id="ActionArea" style="display: inline">
+  <input type="button" id="idButtonEdit" value="Edit ..." onclick="selectAreaButton('edit')"> &nbsp; 
+  <input type="button" id="idButtonSort" value="Sort ..." onclick="selectAreaButton('sort')"> &nbsp; 
+  <input type="button" id="idButtonDuplicates" value="Duplicates ..." onclick="selectAreaButton('duplicates')"> &nbsp; 
+  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('set theory')"> &nbsp; 
+  <input type="button" id="idButtonCompare" value="Compare ..." onclick="selectAreaButton('compare')"> &nbsp; 
+  <a href="javascript:showHelp('overall')" class="boldNoUnderline">?</a>
+  <br /><br />
+</div>
+<!-- ### unused -->
+<div id="BreadcrumbsArea" style="display: none"></div>
+<!-- Edit -->
+<span id="idEditArea" style="display: none">
+  <!-- Edit - Trim -->
+  <input type="button" value="trim" onclick="trim()"><br />
+  <!-- Edit - Case -->
+  <input type="button" value="lowercase" onclick="lowercase()"> &nbsp;
+  <input type="button" value="uppercase" onclick="uppercase()"> &nbsp;
+  <input type="button" value="propercase" onclick="propercase()"><br />
+  <!-- Edit - Repeat -->
+  <input type="number" id="RepeatTimes" value='10'> x &nbsp; 
+  <input type="button" value="repeat" onclick="repeat()"><br />
+  <!-- Edit - Split -->
+  Delimiter <input type="text" id="SplitDelimiter" value="," class="littleCentered">
+  <label><input type="checkbox" id="SplitMasking"> has mask with </label>
+  <input type="text" id="SplitMaskingChar" value='"' class="littleCentered"> &nbsp;
+  <input type="button" value="split" onclick="split()"><br />
+  <!-- Edit - Join -->
+  Delimiter <input type="text" id="JoinDelimiter" value="," class="littleCentered">
+  <label><input type="checkbox" id="JoinMasking"> mask with </label>
+  <input type="text" id="JoinMaskingChar" value='"' class="littleCentered"> &nbsp;
+  <input type="button" value="join" onclick="join()"> <br />
+  <span id="splitErrorMsg" style="color: red"></span>
+</span>
+<!-- Sort -->
+<span id="idSortArea" style="display: none">
+  <label><input type="radio" name="sortType" id="idSortAlpha" checked="checked"> alphabetical</label>
+  <label><input type="radio" name="sortType" id="idSortAscii"> ASCII / Unicode</label> &nbsp;
+  <input type="button" value="go" onclick="sort()"><br />
+</span>
+<!-- Duplicates -->
+<span id="idDuplicatesArea" style="display: none">
+  <label><input type="checkbox" id="duplicatesOnlySingles"> only singles</label> &nbsp;
+  <a href="javascript:showHelp('Duplicates')" class="boldNoUnderline">?</a> &nbsp;
+  <input type="button" value="go" onclick="searchDuplicates()"><br />
+</span>
+<!-- Set Theory -->
+<span id="idSetTheoryArea" style="display: none">
+  <label><input type="radio" name="SetTheoryOptions" id="idSetTheoryInterDiff" checked="checked"> intersection and difference sets </label>
+  <label><input type="radio" name="SetTheoryOptions" id="idSetTheoryUnion"> union set </label>
+  <label><input type="radio" name="SetTheoryOptions" id="idSetTheorySymmDiff"> symmetric difference set </label> &nbsp;
+  <a href="javascript:showHelp('SetTheory')" class="boldNoUnderline">?</a> &nbsp;
+  <input type="button" value="go" onclick="setTheory()"><br />
+</span>
+<!-- Compare -->
+<span id="idCompareArea" style="display: none">
+  <label><input type="checkbox" id="compareDetails" checked="checked"> show details</label> &nbsp;
+  <input type="button" value="go" onclick="compare()"><br />
+  <div id="compareResult"></div>
+</span>
+<br />
+<!-- Output Lists -->
+<span id=CounterList1></span> &nbsp; <span id=CounterList2></span> &nbsp; <span id=CounterList3></span><br />
+<textarea id="List1" cols="38" rows="10" onkeyup="countLines('List1')" onchange="countLines('List1')"></textarea> &nbsp; &nbsp; 
+<textarea id="List2" cols="38" rows="10" onkeyup="countLines('List2')" onchange="countLines('List2')"></textarea> &nbsp; &nbsp; 
+<textarea id="List3" cols="38" rows="10" onkeyup="countLines('List3')" onchange="countLines('List3')"></textarea>
+<!-- hidden + empty Help Popups -->
+<div id="HelpShadow" style="POSITION: absolute; visibility: hidden; top:0px; left: 0px;"> </div>
+<div id="HelpPopup" style="POSITION: absolute; font: Arial, sans-serif; background:#FFFFFF; visibility: hidden; top:100px; left: 150px;"> </div>
+<!-- test -->
+<br />
+<!-- <input type="button" value="test" onclick="test()"><br /> -->
+</body>
+</html>

@@ -1,0 +1,85 @@
+body{
+	font-family: sans-serif;
+	padding-left: 20px;
+}
+
+.Header {
+	margin-top: 5px;
+	margin-bottom: 30px;
+	text-align: center; /* text-indent:10px; */
+	width: 650px; /* 65% */
+	padding: 10px;
+	border: 1px solid;
+	box-shadow: 5px 5px 10px grey;
+}
+
+.pressedButton {
+    background-color: white;
+	color: gray;
+	border: 0.1em solid gray;
+}
+
+.boldNoUnderline {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+table.b1b{
+	border: 1px solid Black; /* Black  #000000 */
+}
+
+.HelpShadow {
+    display: block;
+    /* width: 400px; */ /* -> dynamical */
+    /* height: 400px; */ /* -> dynamical */
+	background-color: #000000;
+	opacity: 0.5;
+	/* text-decoration: none; */
+}
+
+div.table {
+	display: table;
+	/* border-collapse: collapse; */
+}
+
+div.tr {
+	display: table-row;
+}
+
+div.td {
+	display: table-cell;
+	border: 1;
+	/* 	border: 1px solid red; */
+}
+
+.ButtonAsText{
+	background-color: transparent;
+	border: 0;
+	padding: 0;
+	font-size: 100%; 
+}
+
+input[type="text"].Descr {
+    width: 100px;
+    border: 0px /* 1px solid #ff0000 */
+}
+
+.littleCentered {
+	width: 3em;
+	text-align: center;
+}
+
+input[type=number] {
+    width: 5em;
+	text-align: center;
+}
+
+.cellSpacing {
+	border-spacing: 0.5em;
+}
+
+.cellBorder {
+	border: 0.1em solid lightgray;
+	padding: 0.5em;
+	vertical-align: top;
+}
