@@ -83,3 +83,9 @@ input[type=number] {
 	padding: 0.5em;
 	vertical-align: top;
 }
+
+.compareResult {
+	border: 1px solid black; 
+	width: 650px;
+	padding-left: 1em;
+}

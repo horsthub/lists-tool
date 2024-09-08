@@ -455,11 +455,13 @@ function compare() {
 	var ListB_ArrayTrimmed = [];
 	var ListA_ValueTrimmed = '';
 	var ListB_ValueTrimmed = '';
-	var result = '';
+	var result;
 	var detailsA = '';
 	var detailsB = '';
+	result = '<br><div class="compareResult">';
+	result += '<div style="text-align: right;"><a href="javascript:clearCompareResult()" style="text-decoration: none"> &nbsp; &nbsp; &nbsp; x &nbsp; &nbsp; &nbsp; </a></div>';
 	if( ListA_Value == ListB_Value ) {
-		result = 'Both lists are 100 % identical.';
+		result += 'Both lists are 100 % identical.';
 		if(showDetails) {
 			ListA_ArrayTrimmed = trimBlanksLines(ListA_Array);
 			ListB_ArrayTrimmed = trimBlanksLines(ListB_Array);
@@ -472,9 +474,9 @@ function compare() {
 		ListA_ValueTrimmed = ListA_ArrayTrimmed.join('\n');
 		ListB_ValueTrimmed = ListB_ArrayTrimmed.join('\n');
 		if ( ListA_ValueTrimmed == ListB_ValueTrimmed ) {
-			result = 'Besides for beginning and ending spaces (tabs) and empty lines the lists are identical.';
+			result += 'Besides for beginning and ending spaces (tabs) and empty lines the lists are identical.';
 		} else {
-			result = 'The lists are different.';
+			result += 'The lists are different.';
 		}
 	}
 	if(showDetails) {
@@ -495,7 +497,7 @@ function compare() {
 		detailsB += '# of char without linebreaks: ' + (ListB_ValueTrimmed.length - ListB_ArrayTrimmed.length + 1);
 		document.getElementById('List2').value = detailsB;
 	}
-	result = result + ' &nbsp; &nbsp; &nbsp; &nbsp; <a href="javascript:clearCompareResult()">&nbsp; x &nbsp;</a>';
+	result = result + '<br><br></div>';
 	document.getElementById('compareResult').innerHTML = result;
 	countLinesX('List1_List2');
 } // function compare
