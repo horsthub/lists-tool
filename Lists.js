@@ -55,6 +55,21 @@ function showHelp(helpType) {
 			helpBody += 'symmetric difference set<br>';
 			helpBody += ' &nbsp; &nbsp; <img src="SetTheory_SymetricDifferenceSet.svg" />';
 			break;
+		case 'Compare':
+			var helpHeader = '<b>Compare</b>';
+			var helpBody = 'VSCodium / VS Code and other tools<br>';
+			helpBody += 'have definitely better compare features.<br>';
+			helpBody += 'But they need to have the texts stored in files.<br><br>';
+			helpBody += 'If you have your texts only in the clipboard,<br>';
+			helpBody += 'then this tool comes into play.<br>';
+			helpBody += 'The aim is to have a quick compare<br>';
+			helpBody += 'without dealing with files and the later cleanup. &nbsp; <br><br>';
+			helpBody += 'The tool compares the texts for:';
+			helpBody += '<ul>';
+			helpBody += '  <li>exact equality</li>';
+			helpBody += '  <li>\'trimmed\' equality (without empty lines and whitespaces from both sides of the lines)</li>';
+			helpBody += '<ul><br>';
+			break;
 		default:
 			var helpHeader = '¤¤¤';
 			var helpBody = '¤¤¤ ¤¤¤';
