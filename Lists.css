@@ -14,7 +14,7 @@ body{
 }
 
 .pressedButton {
-    background-color: white;
+	background-color: white;
 	color: gray;
 	border: 0.1em solid gray;
 }
@@ -29,9 +29,9 @@ table.b1b{
 }
 
 .HelpShadow {
-    display: block;
-    /* width: 400px; */ /* -> dynamical */
-    /* height: 400px; */ /* -> dynamical */
+	display: block;
+	/* width: 400px; */ /* -> dynamical */
+	/* height: 400px; */ /* -> dynamical */
 	background-color: #000000;
 	opacity: 0.5;
 	/* text-decoration: none; */
@@ -60,8 +60,8 @@ div.td {
 }
 
 input[type="text"].Descr {
-    width: 100px;
-    border: 0px /* 1px solid #ff0000 */
+	width: 100px;
+	border: 0px /* 1px solid #ff0000 */
 }
 
 .littleCentered {
@@ -69,8 +69,23 @@ input[type="text"].Descr {
 	text-align: center;
 }
 
+.listMenuRelative {
+	position: relative;
+	width: 1.5em;
+}
+
+.listMenuAbsolute {
+	position: absolute;
+	width: 13em;
+	right: 0;
+	background-color: white;
+	border: 1px solid black;
+	padding-left: 0.5em;
+	padding-bottom: 0.5em;
+}
+
 input[type=number] {
-    width: 5em;
+	width: 5em;
 	text-align: center;
 }
 

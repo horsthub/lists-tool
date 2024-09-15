@@ -1,6 +1,13 @@
 "use strict";
 
-var HelpStatusActive = false;
+const cellAmountObj = {
+  Input: 2,
+  InputCol: 0, // 0=one row, 1=one col, 2=two col, ...
+  Output: 3,
+  OutputCol: 0
+};
+var helpStatusActive = false;
+var listMenuStatus = ''; // '', 'Input', ('Output')
 
 function showHelp(helpType) {
 	var w = window.innerWidth;
@@ -8,7 +15,7 @@ function showHelp(helpType) {
 	var shadowHtml = '<a href="javascript:closeHelp()" class="HelpShadow" style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
 	var tableStart = '<table class="b1b"><tr><td> &nbsp; &nbsp; </td><td>'
 	var tableEnd = '</td><td> &nbsp; &nbsp; </td></tr></table>'
-	var closeButton = '<div style="text-align: right;"> <a href="javascript:closeHelp()" style="text-decoration: none"> &nbsp; &nbsp; &nbsp; x &nbsp; &nbsp; &nbsp; </a> </div>';
+	var closeButton = '<div style="text-align: right;"> <a href="javascript:closeHelp()" style="text-decoration: none"> &nbsp; &nbsp; x &nbsp; &nbsp; </a> </div>';
 	switch(helpType) {
 		case 'overall':
 			var helpHeader = '<b>Lists Tool</b>';
@@ -79,7 +86,7 @@ function showHelp(helpType) {
 	document.getElementById('HelpShadow').style.visibility = 'visible';
 	document.getElementById('HelpPopup').innerHTML = tableStart + closeButton + helpHeader + '<br><br>' + helpBody + tableEnd;
 	document.getElementById('HelpPopup').style.visibility = 'visible';
-	HelpStatusActive = true;
+	helpStatusActive = true;
 }  // function showHelp
 
 function closeHelp() {
@@ -87,17 +94,143 @@ function closeHelp() {
 	document.getElementById('HelpShadow').innerHTML = ' ';
 	document.getElementById('HelpPopup').style.visibility = 'hidden';
 	document.getElementById('HelpPopup').innerHTML = ' ';
-	HelpStatusActive = false;
+	helpStatusActive = false;
 }  // function closeHelp
 
 document.onkeydown = function(evt) {
     if (evt.keyCode == 27) { // ESC-Key
-        if (HelpStatusActive) {
+        if (helpStatusActive) {
 			closeHelp();
+		} else if (listMenuStatus != '') {
+			closeListMenu(listMenuStatus);
 		}
     }
 }; // event document.onkeydown
 
+function openListMenu(table) {
+	// table: 'Input', ('Output')
+	var paremeter = "'" + table + "'";
+	var w = window.innerWidth;
+    var h = window.innerHeight;
+	var shadowHtml = '<a href="javascript:closeListMenu(' + paremeter + ')" class="HelpShadow" ';
+	shadowHtml += 'style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
+	document.getElementById('HelpShadow').innerHTML = shadowHtml;
+	document.getElementById('HelpShadow').style.visibility = 'visible';
+	document.getElementById('idMenu'+table).style.visibility = 'visible';
+	listMenuStatus = table;
+}
+
+function closeListMenu(table){
+	document.getElementById('HelpShadow').style.visibility = 'hidden';
+	document.getElementById('HelpShadow').innerHTML = ' ';
+	document.getElementById('idMenu' + table).style.visibility = 'hidden';
+	listMenuStatus = '';
+}
+
+function getCellName(number) {
+	var cellName = '';
+	var modulo;
+	while (number > 0) {
+		number--;
+		modulo = number % 26;
+		cellName = String.fromCharCode(65 + modulo) + cellName;
+		number -= modulo;
+		number /= 26;
+	}
+	return cellName;
+}
+
+function getRowTagByColAndCellAndTotal(tag, col, cell, total) {
+	// calculates if the html tag for the table row is needed, if needed then returns the start or end tag
+	// tag: 'start', 'end'
+	// col: the amount of colums the table has
+	// cell: the number of the cell
+	// total: the amount of cells
+	var code = (tag == 'start') ? '<div class="tr">' : '</div>';
+	if (col == 0) { // start tag only for the first cell and end tag only for the last cell
+		if (tag == 'start' && cell == 1) {
+			return code;
+		} else if (tag == 'end' && cell == total) {
+			return code;
+		} else {
+			return '';
+		}
+	} else if (col == 1) { // start and end tags for all cells
+		return code;
+	} else {
+		if (tag == 'end' && cell == total) { // end tag for all last cells 
+			return code;
+		} else if (tag == 'start') { // start tag for the cells after the n-th cells (includes the 0-th cell)
+			return (cell % col == 1) ? code : '';
+		} else { // tag == 'end' // end tag for all n-th cells
+			return (cell % col == 0) ? code : '';
+		}
+	}
+}
+  
+function tableEdit(table, operation) {
+	// table: 'Input', ('Output')
+	// operation: 'init', 'add', 'col'
+	var tableName = 'id' + table + 'Table';
+	var cellAmountOld = cellAmountObj[table];
+	if (operation == 'add') {
+		cellAmountObj[table]++;
+	}
+	var cellAmountNew = cellAmountObj[table];
+	if (operation == 'col') {
+		cellAmountObj[table + 'Col'] = 1 * document.getElementById('idCol').value;
+	}
+	var col = cellAmountObj[table + 'Col'];
+	var listValues = [];
+	var listDescr = [];  
+	// save data
+	if (operation != 'init') {
+		for (let i=1; i<=cellAmountOld; i++) {
+		let cellName = getCellName(i);
+		listValues[i] = document.getElementById('List'+cellName).value;
+		listDescr[i] = document.getElementById('Descr'+cellName).value;
+		}
+	}
+	// build new table
+	var code = '';
+	for (let i=1; i<=cellAmountNew; i++) {
+		let cellName = getCellName(i);
+		let cellParameter = "'List" + cellName + "'";
+		// start of row
+		code += getRowTagByColAndCellAndTotal('start', col, i, cellAmountNew);
+		// cell with fields and values
+		code +='<div class="td">';
+		code += '<input type="button" value="List ' + cellName + '" onclick="List' + cellName + '.value=\'\'" class="ButtonAsText">';
+		code += '<input type="text" id="Descr' + cellName + '" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
+		code += '<span id=CounterList' + cellName + '></span> <br />';
+		code += '<textarea id="List' + cellName + '" cols="38" rows="10" value="abc"';
+		code += '  onkeyup="countLines(' + cellParameter + ')" onchange="countLines(' + cellParameter + ')">';
+		code += '</textarea> &nbsp; &nbsp; <br />';
+		code +='</div>'; 
+		// end of row
+		code += getRowTagByColAndCellAndTotal('end', col, i, cellAmountNew);
+	}
+	document.getElementById(tableName).innerHTML = code;
+	// restore data // if restore is done within building the table, there are issues with ending html tags
+	if (operation != 'init') {
+		for (let i=1; i<=cellAmountOld; i++) {
+		let cellName = getCellName(i);
+		document.getElementById('List'+cellName).value = listValues[i];
+		document.getElementById('Descr'+cellName).value = listDescr[i];
+		}
+	}
+	// count lines
+	for (let i=1; i<=cellAmountNew; i++) {
+		countLines('List' + getCellName(i));
+	}
+	countLinesX('List1_List2_List3');
+	closeListMenu(table);
+	// ### in long-term the code of input field will calculated dynamically
+	// update max value of input field for columns
+	document.getElementById('idCol').min = 0;
+	document.getElementById('idCol').max = cellAmountNew - 1;
+}
+  
 function getArea(area, type) {
 	var areaArray = ['edit', 'sort', 'duplicates', 'set theory', 'compare'];
 	var descriptionArray = ['Edit', 'Sort', 'Duplicates', 'Set Theory', 'Compare'];
