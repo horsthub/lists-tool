@@ -381,60 +381,66 @@ function split() {
 		// masked parts with mask character in the middle is not allowed and the position is reported
 		var textSource = document.getElementById('ListA').value;
 		var maskingChar = document.getElementById('SplitMaskingChar').value;
+		var deliLen = delimiter.length;
+		var maskLen = maskingChar.length;
 		var i;
 		var textOut = '';
 		var posPartStart = 0;
 		var status = 'start'; 
-		// start:    in next loop: beginning mask or start of unmaksed  part or delimiter expected
+		// start:    in next loop: beginning mask or start of unmasked part or delimiter expected
 		// masked:   in next loop: masked chars of part or ending mask expected
 		// unmasked: in next loop: unmasked chars of part or ending mask expected
 		// end:      in next loop: delimiter expected, because of ending mask
 		var allOK = true;
 		var errorMsg = '<br/>Incorrect masks:';
 		for (i = 0; i < textSource.length; i++) { // looping through string
-			// textOut += i.toString() + ': ' + textSource[i] + '\n';
-			switch(textSource[i]) {
-				case maskingChar:
-					if (status == 'start') { // start mask
-						posPartStart = i + 1;
-						status = 'masked';
-					} else if (status == 'masked') { // end mask
-						textOut += textSource.substring( posPartStart, i );
-						status = 'end';
-					} else if (status == 'end') { // mask char after masking
-						allOK = false;
-						errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
-						status = 'unmasked'
-					}
-					break;
-				case delimiter:
-					if (status == 'masked') {
-						// skip (delimiter within mask);
-					} else if (status == 'end') { // end of part
-						textOut += '\n';
-						posPartStart = i + 1;
-						status = 'start';
-					} else if (status == 'unmasked') { // end of part
-						textOut += textSource.substring( posPartStart, i ) +  '\n';
-						posPartStart = i + 1;
-						status = 'start';
-					} else if (status == 'start') { // empty string
-						textOut += '\n';
-						posPartStart = i + 1;
-						status = 'start';
-					}
-					break;
-				default:
-					if (status == 'start') { // first char of part
-						status = 'unmasked'
-					} else if (status == 'end') { // char after masking
-						allOK = false;
-						errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
-						status = 'unmasked'
-					} else { // looping through part (status: masked and unmasked)
-						// skip
-					}
-			} // end of switch
+			// until end of block is looped and then the block is copied to target
+			// (seen afterwards: char by char would have been probably easier)
+			if (textSource.substr(i, maskLen) == maskingChar) {
+				if (status == 'start') { // start mask
+					posPartStart = i + maskLen;
+					status = 'masked';
+					i = i + maskLen - 1;
+				} else if (status == 'masked') { // end mask
+					textOut += textSource.substring( posPartStart, i );
+					status = 'end';
+					i = i + maskLen - 1;
+				} else if (status == 'end') { // mask char after masking
+					i = i + maskLen - 1;
+					allOK = false;
+					errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
+					status = 'unmasked'
+				}
+			} else if (textSource.substr(i, deliLen) == delimiter) {
+				if (status == 'masked') {
+					// skip (delimiter within mask);
+				} else if (status == 'end') { // end of masked part
+					textOut += '\n';
+					i = i + deliLen - 1;
+					posPartStart = i + 1;
+					status = 'start';
+				} else if (status == 'unmasked') { // end of part
+					textOut += textSource.substring( posPartStart, i ) +  '\n';
+					i = i + deliLen - 1;
+					posPartStart = i + 1;
+					status = 'start';
+				} else if (status == 'start') { // empty string
+					textOut += '\n';
+					i = i + deliLen - 1;
+					posPartStart = i + 1;
+					status = 'start';
+				}
+			} else {
+				if (status == 'start') { // first char of part
+					status = 'unmasked'
+				} else if (status == 'end') { // char after masking
+					allOK = false;
+					errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
+					status = 'unmasked'
+				} else { // looping through part (status: masked and unmasked)
+					// skip
+				}
+			}
 		} // looping through string
 		if (status == 'masked') {
 			allOK = false;
@@ -649,12 +655,3 @@ function compare() {
 	document.getElementById('compareResult').innerHTML = result;
 	countLinesX('List1_List2');
 } // function compare
-
-function test() {
-	//alert('hi x : ' + document.getElementById('ListA').value);
-	//document.getElementById('ListA').value = 'hi world';
-	var ListAArray = document.getElementById('ListA').value.split('\n');
-	for(var i = 0;i < ListAArray.length;i++){
-		alert(i + ' ' + ListAArray[i]);
-	}
-} // function test
