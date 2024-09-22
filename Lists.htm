@@ -7,10 +7,10 @@
 	<script src="Lists.js"></script>
 </head>
 
-<body onload="tableEdit('Input', 'init')">
+<body onload="init()">
 <!-- hidden + empty Help Popups -->
-<div id="HelpShadow" style="position: absolute; visibility: hidden; top:0px; left: 0px;"> </div>
-<div id="HelpPopup" style="position: absolute; font: Arial, sans-serif; background:#FFFFFF; visibility: hidden; top:100px; left: 150px;"> </div>
+<div id="HelpShadow" style="position: absolute; visibility: hidden; top:0px; left: 0px;"></div>
+<div id="HelpPopup" style="position: absolute; font: Arial, sans-serif; background:#FFFFFF; visibility: hidden; top:100px; left: 150px;"></div>
 <!-- Title -->
 <h3 class="Header">Lists Tool</h3>
 <!-- Input Lists -->
@@ -22,17 +22,9 @@
       </div>
     </div>
     <div class="td">
-      <a href="javascript:openListMenu('Input')" class="boldNoUnderline">&#128736;</a> <!--  &#128736; 🛠   &#9874; ⚒   &#128295; 🔧 -->
-      <div class="listMenuRelative">
-        <div id="idMenuInput" style="visibility: hidden" class="listMenuAbsolute">
-          <div style="text-align: right;"> 
-            <a href="javascript:closeListMenu('Input')" style="text-decoration: none"> &nbsp; &nbsp; x &nbsp; &nbsp; </a> 
-          </div>
-          <button onclick="tableEdit('Input', 'add')">Add list field</button><br><br>
-          Lists in <input type="number" id="idCol" value="0"> columns 
-          (0: all in one line)<br>
-          <button onclick="tableEdit('Input', 'col')">Arrange</button>
-        </div>
+      <a href="javascript:openListMenu('Input')" class="boldNoUnderline">&#128736;</a> <!-- &#128736; 🛠 -->
+      <div id="idRelativeDivInput" class="listMenuRelative">
+        <!-- is filled by openListMenu() -->
       </div>
     </div>
   </div>
@@ -102,10 +94,21 @@
 </span>
 <br />
 <!-- Output Lists -->
-<span id=CounterList1></span> &nbsp; <span id=CounterList2></span> &nbsp; <span id=CounterList3></span><br />
-<textarea id="List1" cols="38" rows="10" onkeyup="countLines('List1')" onchange="countLines('List1')"></textarea> &nbsp; &nbsp; 
-<textarea id="List2" cols="38" rows="10" onkeyup="countLines('List2')" onchange="countLines('List2')"></textarea> &nbsp; &nbsp; 
-<textarea id="List3" cols="38" rows="10" onkeyup="countLines('List3')" onchange="countLines('List3')"></textarea>
+<div class="table">
+  <div class="tr">
+    <div class="td">
+      <div class="table" id="idOutputTable">
+        <!-- is filled by 'body onload' -->
+      </div>
+    </div>
+    <div class="td">
+      <a href="javascript:openListMenu('Output')" class="boldNoUnderline">&#128736;</a> <!-- &#128736; 🛠 -->
+      <div id="idRelativeDivOutput" class="listMenuRelative">
+        <!-- is filled by openListMenu() -->
+      </div>
+    </div>
+  </div>
+</div>
 <br />
 </body>
 </html>

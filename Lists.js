@@ -1,13 +1,18 @@
 "use strict";
 
 const cellAmountObj = {
-  Input: 2,
-  InputCol: 0, // 0=one row, 1=one col, 2=two col, ...
-  Output: 3,
-  OutputCol: 0
+  Input: 2, // amount of Input fields
+  InputCol: 0, // amount of Input columns // 0=one row, 1=one col, 2=two col, ...
+  Output: 3, // amount of Output fields
+  OutputCol: 0 // amount of Output columns // 0=one row, 1=one col, 2=two col, ...
 };
-var helpStatusActive = false;
-var listMenuStatus = ''; // '', 'Input', ('Output')
+var helpStatusActive = false;  // needed to close with ESC
+var listMenuStatus = ''; // '', 'Input', 'Output' // needed to close with ESC
+
+function init() {
+	tableEdit('Input', 'init');
+	tableEdit('Output', 'init');
+}
 
 function showHelp(helpType) {
 	var w = window.innerWidth;
@@ -91,15 +96,15 @@ function showHelp(helpType) {
 
 function closeHelp() {
 	document.getElementById('HelpShadow').style.visibility = 'hidden';
-	document.getElementById('HelpShadow').innerHTML = ' ';
+	document.getElementById('HelpShadow').innerHTML = '';
 	document.getElementById('HelpPopup').style.visibility = 'hidden';
-	document.getElementById('HelpPopup').innerHTML = ' ';
+	document.getElementById('HelpPopup').innerHTML = '';
 	helpStatusActive = false;
 }  // function closeHelp
 
 document.onkeydown = function(evt) {
-    if (evt.keyCode == 27) { // ESC-Key
-        if (helpStatusActive) {
+	if (evt.keyCode == 27) { // ESC-Key
+		if (helpStatusActive) {
 			closeHelp();
 		} else if (listMenuStatus != '') {
 			closeListMenu(listMenuStatus);
@@ -108,34 +113,59 @@ document.onkeydown = function(evt) {
 }; // event document.onkeydown
 
 function openListMenu(table) {
-	// table: 'Input', ('Output')
-	var paremeter = "'" + table + "'";
+	// table: 'Input', 'Output'
+	var parameterClose = "'" + table + "'";
+	var parameterAdd = "'" + table + "', 'add'";
+	var parameterCol = "'" + table + "', 'col'";
 	var w = window.innerWidth;
     var h = window.innerHeight;
-	var shadowHtml = '<a href="javascript:closeListMenu(' + paremeter + ')" class="HelpShadow" ';
+	var shadowHtml = '<a href="javascript:closeListMenu(' + parameterClose + ')" class="HelpShadow" ';
 	shadowHtml += 'style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
 	document.getElementById('HelpShadow').innerHTML = shadowHtml;
 	document.getElementById('HelpShadow').style.visibility = 'visible';
-	document.getElementById('idMenu'+table).style.visibility = 'visible';
+	var col = cellAmountObj[table + 'Col'];
+	var cells = cellAmountObj[table];
+	var menuHtml = '';
+	menuHtml += '<div class="listMenuAbsolute">';
+	menuHtml += '  <div style="text-align: right;">';
+	menuHtml += '	<a href="javascript:closeListMenu(' + parameterClose + ')" style="text-decoration: none"> &nbsp; &nbsp; x &nbsp; &nbsp; </a>';
+	menuHtml += '  </div>';
+	menuHtml += '  <button onclick="tableEdit(' + parameterAdd + ')">Add list field</button><br><br>';
+	menuHtml += '  Lists in <input type="number" id="idCol' + table + '" value="' + col + '" min="0" max="' + cells + '"> columns';
+	menuHtml += '  (0: all in one line)<br>';
+	menuHtml += '  <button onclick="tableEdit(' + parameterCol + ')">Arrange</button>';
+	menuHtml += '</div>';
+	document.getElementById('idRelativeDiv' + table).innerHTML = menuHtml;
 	listMenuStatus = table;
 }
 
 function closeListMenu(table){
 	document.getElementById('HelpShadow').style.visibility = 'hidden';
-	document.getElementById('HelpShadow').innerHTML = ' ';
-	document.getElementById('idMenu' + table).style.visibility = 'hidden';
+	document.getElementById('HelpShadow').innerHTML = '';
+	document.getElementById('idRelativeDiv' + table).innerHTML = '';
 	listMenuStatus = '';
 }
 
-function getCellName(number) {
+function clearList(cellId) {
+	document.getElementById(cellId).value = '';
+	countLines(cellId);
+}
+
+function getCellName(table, number) {
+	// table: 'Input' -> Roman, 'Output' -> Greek
+	// Roman alphabet: 16 characters (65-90)
+	// Greek alphabet: 24 characters (945-961, 963-969)
+	var charAmount = (table == 'Input') ? 26 : 24;
+	var startCharCode = (table == 'Input') ? 65 : 945;
 	var cellName = '';
 	var modulo;
 	while (number > 0) {
 		number--;
-		modulo = number % 26;
-		cellName = String.fromCharCode(65 + modulo) + cellName;
+		modulo = number % charAmount;
+		let sigmaGap = (table == 'Output' && modulo >= 17) ? 1 : 0;
+		cellName = String.fromCharCode(startCharCode + sigmaGap + modulo) + cellName;
 		number -= modulo;
-		number /= 26;
+		number /= charAmount;
 	}
 	return cellName;
 }
@@ -169,7 +199,7 @@ function getRowTagByColAndCellAndTotal(tag, col, cell, total) {
 }
   
 function tableEdit(table, operation) {
-	// table: 'Input', ('Output')
+	// table: 'Input', 'Output'
 	// operation: 'init', 'add', 'col'
 	var tableName = 'id' + table + 'Table';
 	var cellAmountOld = cellAmountObj[table];
@@ -178,7 +208,7 @@ function tableEdit(table, operation) {
 	}
 	var cellAmountNew = cellAmountObj[table];
 	if (operation == 'col') {
-		cellAmountObj[table + 'Col'] = 1 * document.getElementById('idCol').value;
+		cellAmountObj[table + 'Col'] = 1 * document.getElementById('idCol' + table).value;
 	}
 	var col = cellAmountObj[table + 'Col'];
 	var listValues = [];
@@ -186,24 +216,25 @@ function tableEdit(table, operation) {
 	// save data
 	if (operation != 'init') {
 		for (let i=1; i<=cellAmountOld; i++) {
-		let cellName = getCellName(i);
-		listValues[i] = document.getElementById('List'+cellName).value;
-		listDescr[i] = document.getElementById('Descr'+cellName).value;
+		let cellID = (table == 'Input') ? getCellName(table, i) : i;
+		listValues[i] = document.getElementById('List'+cellID).value;
+		listDescr[i] = document.getElementById('Descr'+cellID).value;
 		}
 	}
 	// build new table
 	var code = '';
 	for (let i=1; i<=cellAmountNew; i++) {
-		let cellName = getCellName(i);
-		let cellParameter = "'List" + cellName + "'";
+		let cellName = getCellName(table, i);
+		let cellID = (table == 'Input') ? cellName : i;
+		let cellParameter = "'List" + cellID + "'";
 		// start of row
 		code += getRowTagByColAndCellAndTotal('start', col, i, cellAmountNew);
 		// cell with fields and values
 		code +='<div class="td">';
-		code += '<input type="button" value="List ' + cellName + '" onclick="List' + cellName + '.value=\'\'" class="ButtonAsText">';
-		code += '<input type="text" id="Descr' + cellName + '" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
-		code += '<span id=CounterList' + cellName + '></span> <br />';
-		code += '<textarea id="List' + cellName + '" cols="38" rows="10" value="abc"';
+		code += '<a href="javascript:clearList(' + cellParameter + ')" class="blackNoUnderline">List ' + cellName + '</a>';
+		code += '<input type="text" id="Descr' + cellID + '" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
+		code += '<span id=CounterList' + cellID + '></span> <br />';
+		code += '<textarea id="List' + cellID + '" cols="38" rows="10"';
 		code += '  onkeyup="countLines(' + cellParameter + ')" onchange="countLines(' + cellParameter + ')">';
 		code += '</textarea> &nbsp; &nbsp; <br />';
 		code +='</div>'; 
@@ -214,21 +245,17 @@ function tableEdit(table, operation) {
 	// restore data // if restore is done within building the table, there are issues with ending html tags
 	if (operation != 'init') {
 		for (let i=1; i<=cellAmountOld; i++) {
-		let cellName = getCellName(i);
-		document.getElementById('List'+cellName).value = listValues[i];
-		document.getElementById('Descr'+cellName).value = listDescr[i];
+		let cellID = (table == 'Input') ? getCellName(table, i) : i;
+		document.getElementById('List'+cellID).value = listValues[i];
+		document.getElementById('Descr'+cellID).value = listDescr[i];
 		}
+		closeListMenu(table);
 	}
 	// count lines
 	for (let i=1; i<=cellAmountNew; i++) {
-		countLines('List' + getCellName(i));
+		let cellID = (table == 'Input') ? getCellName(table, i) : i;
+		countLines('List' + cellID);
 	}
-	countLinesX('List1_List2_List3');
-	closeListMenu(table);
-	// ### in long-term the code of input field will calculated dynamically
-	// update max value of input field for columns
-	document.getElementById('idCol').min = 0;
-	document.getElementById('idCol').max = cellAmountNew - 1;
 }
   
 function getArea(area, type) {
@@ -281,14 +308,14 @@ function selectAreaButton(area) {
 	} // if breadcrumbs-link pressed
 } // function selectAreaButton
 
-function countLines(fieldName) {
+function countLines(fieldId) {
 	var counter;
-	if (document.getElementById(fieldName).value == '') {
+	if (document.getElementById(fieldId).value == '') {
 		counter = 0;	
 	} else {
-		counter = document.getElementById(fieldName).value.split('\n').length;
+		counter = document.getElementById(fieldId).value.split('\n').length;
 	}
-	document.getElementById('Counter' + fieldName).innerHTML = counter + ' lines';
+	document.getElementById('Counter' + fieldId).innerHTML = counter + ' lines';
 } // function countLines
 
 function countLinesX(which) {

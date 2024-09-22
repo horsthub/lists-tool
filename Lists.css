@@ -14,9 +14,14 @@ body{
 }
 
 .pressedButton {
-	background-color: white;
+    background-color: white;
 	color: gray;
 	border: 0.1em solid gray;
+}
+
+.blackNoUnderline {
+	text-decoration: none;
+	color: black;
 }
 
 .boldNoUnderline {
@@ -25,14 +30,14 @@ body{
 }
 
 table.b1b{
-	border: 1px solid Black; /* Black  #000000 */
+	border: 1px solid black;
 }
 
 .HelpShadow {
-	display: block;
-	/* width: 400px; */ /* -> dynamical */
-	/* height: 400px; */ /* -> dynamical */
-	background-color: #000000;
+    display: block;
+    /* width: 400px; */ /* -> dynamical */
+    /* height: 400px; */ /* -> dynamical */
+	background-color: black;
 	opacity: 0.5;
 	/* text-decoration: none; */
 }
@@ -40,6 +45,7 @@ table.b1b{
 div.table {
 	display: table;
 	/* border-collapse: collapse; */
+	/* border: 1px solid blue; */ /* used for troubleshooting */
 }
 
 div.tr {
@@ -49,7 +55,7 @@ div.tr {
 div.td {
 	display: table-cell;
 	border: 1;
-	/* 	border: 1px solid red; */
+	/* border: 1px solid red; */ /* used for troubleshooting */
 }
 
 .ButtonAsText{
@@ -60,8 +66,8 @@ div.td {
 }
 
 input[type="text"].Descr {
-	width: 100px;
-	border: 0px /* 1px solid #ff0000 */
+    width: 100px;
+    border: 0px /* 1px solid #ff0000 */
 }
 
 .littleCentered {
@@ -72,6 +78,7 @@ input[type="text"].Descr {
 .listMenuRelative {
 	position: relative;
 	width: 1.5em;
+	/* border: 1px solid blue; */ /* used for troubleshooting */
 }
 
 .listMenuAbsolute {
@@ -85,7 +92,7 @@ input[type="text"].Descr {
 }
 
 input[type=number] {
-	width: 5em;
+    width: 5em;
 	text-align: center;
 }
 
