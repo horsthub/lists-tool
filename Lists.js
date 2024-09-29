@@ -70,7 +70,7 @@ function showHelp(helpType) {
 		case 'Compare':
 			var helpHeader = '<b>Compare</b>';
 			var helpBody = 'VSCodium / VS Code and other tools<br>';
-			helpBody += 'have definitely better compare features.<br>';
+			helpBody += 'have indisputable better compare features.<br>';
 			helpBody += 'But they need to have the texts stored in files.<br><br>';
 			helpBody += 'If you have your texts only in the clipboard,<br>';
 			helpBody += 'then this tool comes into play.<br>';
@@ -79,8 +79,11 @@ function showHelp(helpType) {
 			helpBody += 'The tool compares the texts for:';
 			helpBody += '<ul>';
 			helpBody += '  <li>exact equality</li>';
-			helpBody += '  <li>\'trimmed\' equality (without empty lines and whitespaces from both sides of the lines)</li>';
-			helpBody += '<ul><br>';
+			helpBody += '  <li>case insensitive equality</li>';
+			helpBody += '  <li>\'trimmed\' equality¹</li>';
+			helpBody += '</ul>';
+			helpBody += '¹ without empty lines and whitespaces² from both sides of the lines<br>';
+			helpBody += '² spaces, tabs and others<br><br>';
 			break;
 		default:
 			var helpHeader = '¤¤¤';
@@ -331,7 +334,7 @@ function trimBlanksLines(array) {
 	// 			with trimmed lines (spaces at the beginning and the end of the line are removed)
 	//			and without empty lines (lines with only blanks are also removed)
 	var trimmed = [];
-	var trimmedLine = '';
+	var trimmedLine;
 	for ( var i = 0; i < array.length; i++) { // loop through the array
 		trimmedLine = array[i].trim();
 		if ( trimmedLine != '' ) { // valid line
@@ -632,10 +635,14 @@ function compare() {
 	var ListB_Value = document.getElementById('ListB').value;
 	var ListA_Array = ListA_Value.split('\n');
 	var ListB_Array = ListB_Value.split('\n');
-	var ListA_ArrayTrimmed = [];
-	var ListB_ArrayTrimmed = [];
-	var ListA_ValueTrimmed = '';
-	var ListB_ValueTrimmed = '';
+	var ListA_ArrayLowerCase = ListA_Value.toLowerCase();
+	var ListB_ArrayLowerCase = ListB_Value.toLowerCase();
+	var ListA_ArrayTrimmed = trimBlanksLines(ListA_Array);
+	var ListB_ArrayTrimmed = trimBlanksLines(ListB_Array);
+	var ListA_ValueTrimmed = ListA_ArrayTrimmed.join('\n');
+	var ListB_ValueTrimmed = ListB_ArrayTrimmed.join('\n');
+	var ListA_ArrayLowerCaseTrimmed = ListA_ValueTrimmed.toLowerCase();
+	var ListB_ArrayLowerCaseTrimmed = ListB_ValueTrimmed.toLowerCase();
 	var result;
 	var detailsA = '';
 	var detailsB = '';
@@ -643,19 +650,21 @@ function compare() {
 	result += '<div style="text-align: right;"><a href="javascript:clearCompareResult()" style="text-decoration: none"> &nbsp; &nbsp; &nbsp; x &nbsp; &nbsp; &nbsp; </a></div>';
 	if( ListA_Value == ListB_Value ) {
 		result += 'Both lists are 100 % identical.';
-		if(showDetails) {
-			ListA_ArrayTrimmed = trimBlanksLines(ListA_Array);
-			ListB_ArrayTrimmed = trimBlanksLines(ListB_Array);
-			ListA_ValueTrimmed = ListA_ArrayTrimmed.join('\n');
-			ListB_ValueTrimmed = ListB_ArrayTrimmed.join('\n');
-		}
 	} else {
-		ListA_ArrayTrimmed = trimBlanksLines(ListA_Array);
-		ListB_ArrayTrimmed = trimBlanksLines(ListB_Array);
-		ListA_ValueTrimmed = ListA_ArrayTrimmed.join('\n');
-		ListB_ValueTrimmed = ListB_ArrayTrimmed.join('\n');
-		if ( ListA_ValueTrimmed == ListB_ValueTrimmed ) {
-			result += 'Besides for beginning and ending spaces (tabs) and empty lines the lists are identical.';
+		if ( ListA_ArrayLowerCaseTrimmed == ListB_ArrayLowerCaseTrimmed ) {
+			result += 'Both lists are similar except of:<br> &nbsp; ';
+			if ( ListA_ValueTrimmed == ListB_ValueTrimmed ) {
+				result += '=';
+			} else {
+				result += '&#8800;'; // &#8800; ≠
+			}
+			result += ' &nbsp; Capital and lowercase letters<br> &nbsp; ';
+			if ( ListA_ArrayLowerCase == ListB_ArrayLowerCase ) {
+				result += '=';
+			} else {
+				result += '&#8800;'; // &#8800; ≠
+			}
+			result += ' &nbsp; Beginning and ending whitespaces and empty lines';
 		} else {
 			result += 'The lists are different.';
 		}
@@ -678,7 +687,7 @@ function compare() {
 		detailsB += '# of char without linebreaks: ' + (ListB_ValueTrimmed.length - ListB_ArrayTrimmed.length + 1);
 		document.getElementById('List2').value = detailsB;
 	}
-	result = result + '<br><br></div>';
+	result += '<br><br></div>';
 	document.getElementById('compareResult').innerHTML = result;
 	countLinesX('List1_List2');
 } // function compare
