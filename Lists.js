@@ -80,10 +80,10 @@ function showHelp(helpType) {
 			helpBody += '<ul>';
 			helpBody += '  <li>exact equality</li>';
 			helpBody += '  <li>case insensitive equality</li>';
-			helpBody += '  <li>\'trimmed\' equality¹</li>';
+			helpBody += '  <li>\'trimmed\' equality&#185;</li>'; <!-- &#185; ¹ -->
 			helpBody += '</ul>';
-			helpBody += '¹ without empty lines and whitespaces² from both sides of the lines<br>';
-			helpBody += '² spaces, tabs and others<br><br>';
+			helpBody += '&#185; without empty lines and whitespaces&#178; from both sides of the lines<br>'; <!-- &#185; ¹  &#178; ² -->
+			helpBody += '&#178; spaces, tabs and others<br><br>'; <!-- &#178; ² -->
 			break;
 		default:
 			var helpHeader = '¤¤¤';
