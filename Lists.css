@@ -13,7 +13,7 @@ body{
 	box-shadow: 5px 5px 10px grey;
 }
 
-.pressedButton {
+.pressedActionTopButton, .pressedActionSubButton, .pressedGoButton {
     background-color: white;
 	color: gray;
 	border: 0.1em solid gray;
@@ -106,8 +106,16 @@ input[type=number] {
 	vertical-align: top;
 }
 
-.compareResult {
+.msgBox {
 	border: 1px solid black; 
 	width: 650px;
 	padding-left: 1em;
+}
+
+.redText {
+	color: red;
+}
+
+.indentText {
+	padding-left: 30px;
 }

@@ -32,11 +32,11 @@
 <br />
 <!-- Action -->
 <div id="ActionArea" style="display: inline">
-  <input type="button" id="idButtonEdit" value="Edit ..." onclick="selectAreaButton('edit')"> &nbsp; 
-  <input type="button" id="idButtonSort" value="Sort ..." onclick="selectAreaButton('sort')"> &nbsp; 
-  <input type="button" id="idButtonDuplicates" value="Duplicates ..." onclick="selectAreaButton('duplicates')"> &nbsp; 
-  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('set theory')"> &nbsp; 
-  <input type="button" id="idButtonCompare" value="Compare ..." onclick="selectAreaButton('compare')"> &nbsp; 
+  <input type="button" id="idButtonEdit" value="Edit ..." onclick="selectAreaButton('top', 'edit')"> &nbsp; 
+  <input type="button" id="idButtonSort" value="Sort ..." onclick="selectAreaButton('top', 'sort')"> &nbsp; 
+  <input type="button" id="idButtonDuplicates" value="Duplicates ..." onclick="selectAreaButton('top', 'duplicates')"> &nbsp; 
+  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('top', 'set theory')"> &nbsp; 
+  <input type="button" id="idButtonCompare" value="Compare ..." onclick="selectAreaButton('top', 'compare')"> &nbsp; 
   <a href="javascript:showHelp('overall')" class="boldNoUnderline">?</a>
   <br /><br />
 </div>
@@ -44,54 +44,74 @@
 <div id="BreadcrumbsArea" style="display: none"></div>
 <!-- Edit -->
 <span id="idEditArea" style="display: none">
+  <!-- Sub-Action Buttons -->
+  <input type="button" id="idButtonTrim" value="Trim ..." onclick="selectAreaButton('sub', 'trim')"> &nbsp; 
+  <input type="button" id="idButtonCase" value="Case ..." onclick="selectAreaButton('sub', 'case')"> &nbsp; 
+  <input type="button" id="idButtonRepeat" value="Repeat ..." onclick="selectAreaButton('sub', 'repeat')"> &nbsp; 
+  <input type="button" id="idButtonSplit" value="Split ..." onclick="selectAreaButton('sub', 'split')"> &nbsp; 
+  <input type="button" id="idButtonJoin" value="Join ..." onclick="selectAreaButton('sub', 'join')"> <br /><br />
   <!-- Edit - Trim -->
-  <input type="button" value="trim" onclick="trim()"><br />
+  <span id="idTrimArea" style="display: none">
+  </span>
   <!-- Edit - Case -->
-  <input type="button" value="lowercase" onclick="lowercase()"> &nbsp;
-  <input type="button" value="uppercase" onclick="uppercase()"> &nbsp;
-  <input type="button" value="propercase" onclick="propercase()"><br />
+  <span id="idCaseArea" style="display: none">
+    <label><input type="radio" name="caseType" id="idCaseLower" checked="checked"> lowercase</label>
+    <label><input type="radio" name="caseType" id="idCaseUpper"> uppercase</label>
+    <label><input type="radio" name="caseType" id="idCaseProper"> propercase</label><br />
+  </span>
   <!-- Edit - Repeat -->
-  <input type="number" id="RepeatTimes" value='10'> x &nbsp; 
-  <input type="button" value="repeat" onclick="repeat()"><br />
+  <span id="idRepeatArea" style="display: none">
+    <input type="number" id="RepeatTimes" value='10'> times <br />
+  </span>
   <!-- Edit - Split -->
-  Delimiter <input type="text" id="SplitDelimiter" value="," class="littleCentered">
-  <label><input type="checkbox" id="SplitMasking"> has mask with </label>
-  <input type="text" id="SplitMaskingChar" value='"' class="littleCentered"> &nbsp;
-  <input type="button" value="split" onclick="split()"><br />
+  <span id="idSplitArea" style="display: none">
+    Delimiter <input type="text" id="SplitDelimiter" value="," class="littleCentered"><br />
+    <label><input type="checkbox" id="SplitMasking"> has mask with </label>
+    <input type="text" id="SplitMaskingChar" value='"' class="littleCentered"><br />
+  </span>
   <!-- Edit - Join -->
-  Delimiter <input type="text" id="JoinDelimiter" value="," class="littleCentered">
-  <label><input type="checkbox" id="JoinMasking"> mask with </label>
-  <input type="text" id="JoinMaskingChar" value='"' class="littleCentered"> &nbsp;
-  <input type="button" value="join" onclick="join()"> <br />
-  <span id="splitErrorMsg" style="color: red"></span>
+  <span id="idJoinArea" style="display: none">
+    Delimiter <input type="text" id="JoinDelimiter" value="," class="littleCentered"><br />
+    <label><input type="checkbox" id="JoinMasking"> mask with </label>
+    <input type="text" id="JoinMaskingChar" value='"' class="littleCentered"><br />
+  </span>
 </span>
 <!-- Sort -->
 <span id="idSortArea" style="display: none">
   <label><input type="radio" name="sortType" id="idSortAlpha" checked="checked"> alphabetical</label>
-  <label><input type="radio" name="sortType" id="idSortAscii"> ASCII / Unicode</label> &nbsp;
-  <input type="button" value="go" onclick="sort()"><br />
+  <label><input type="radio" name="sortType" id="idSortAscii"> ASCII / Unicode</label><br />
 </span>
 <!-- Duplicates -->
 <span id="idDuplicatesArea" style="display: none">
   <label><input type="checkbox" id="duplicatesOnlySingles"> only singles</label> &nbsp;
-  <a href="javascript:showHelp('Duplicates')" class="boldNoUnderline">?</a> &nbsp;
-  <input type="button" value="go" onclick="searchDuplicates()"><br />
+  <a href="javascript:showHelp('Duplicates')" class="boldNoUnderline">?</a><br />
 </span>
 <!-- Set Theory -->
 <span id="idSetTheoryArea" style="display: none">
   <label><input type="radio" name="SetTheoryOptions" id="idSetTheoryInterDiff" checked="checked"> intersection and difference sets </label>
   <label><input type="radio" name="SetTheoryOptions" id="idSetTheoryUnion"> union set </label>
   <label><input type="radio" name="SetTheoryOptions" id="idSetTheorySymmDiff"> symmetric difference set </label> &nbsp;
-  <a href="javascript:showHelp('SetTheory')" class="boldNoUnderline">?</a> &nbsp;
-  <input type="button" value="go" onclick="setTheory()"><br />
+  <a href="javascript:showHelp('SetTheory')" class="boldNoUnderline">?</a><br />
 </span>
 <!-- Compare -->
 <span id="idCompareArea" style="display: none">
   <label><input type="checkbox" id="compareDetails" checked="checked"> show details</label> &nbsp;
-  <a href="javascript:showHelp('Compare')" class="boldNoUnderline">?</a> &nbsp;
-  <input type="button" value="go" onclick="compare()"><br />
-  <div id="compareResult"></div>
+  <a href="javascript:showHelp('Compare')" class="boldNoUnderline">?</a><br />
 </span>
+<!-- Input-Output-Selection -->
+<span id="idInOut">
+  <!-- 
+  is filled by selectAreaButton() -> showInOut()
+  Checkboxes:
+    idInput-Input-1, idInput-Input-2, ..., idInput-Input-#
+    idInputOther
+    idInput-Output-1, idInput-Output-2, ..., idInput-Output-#
+    idOutput-Output-1, idOutput-Output-2, ..., idOutput-Output-#
+    idOutputOther
+    idOutput-Input-1, idOutput-Input-2, ..., idOutput-Input-#
+  -->
+</span>
+<div id="idMessage"></div>
 <br />
 <!-- Output Lists -->
 <div class="table">

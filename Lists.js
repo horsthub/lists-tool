@@ -1,13 +1,21 @@
 "use strict";
 
 const cellAmountObj = {
-  Input: 2, // amount of Input fields
-  InputCol: 0, // amount of Input columns // 0=one row, 1=one col, 2=two col, ...
-  Output: 3, // amount of Output fields
-  OutputCol: 0 // amount of Output columns // 0=one row, 1=one col, 2=two col, ...
+	Input: 2, // amount of Input fields
+	InputCol: 0, // amount of Input columns // 0=one row, 1=one col, 2=two col, ...
+	Output: 3, // amount of Output fields
+	OutputCol: 0 // amount of Output columns // 0=one row, 1=one col, 2=two col, ...
+};
+const InOutAmounts = {
+	edit: '1_1',
+	sort: '1_1',
+	duplicates: '1_2',
+	'set theory': '2_3',
+	compare: '2_2'
 };
 var helpStatusActive = false;  // needed to close with ESC
 var listMenuStatus = ''; // '', 'Input', 'Output' // needed to close with ESC
+var activeSubButton = ''; // '', 'trim', 'case', 'repeat', 'split', 'join'
 
 function init() {
 	tableEdit('Input', 'init');
@@ -16,7 +24,7 @@ function init() {
 
 function showHelp(helpType) {
 	var w = window.innerWidth;
-    var h = window.innerHeight;
+	var h = window.innerHeight;
 	var shadowHtml = '<a href="javascript:closeHelp()" class="HelpShadow" style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
 	var tableStart = '<table class="b1b"><tr><td> &nbsp; &nbsp; </td><td>'
 	var tableEnd = '</td><td> &nbsp; &nbsp; </td></tr></table>'
@@ -80,10 +88,10 @@ function showHelp(helpType) {
 			helpBody += '<ul>';
 			helpBody += '  <li>exact equality</li>';
 			helpBody += '  <li>case insensitive equality</li>';
-			helpBody += '  <li>\'trimmed\' equality&#185;</li>'; <!-- &#185; ¹ -->
+			helpBody += '  <li>\'trimmed\' equality&#185;</li>'; // &#185; ¹
 			helpBody += '</ul>';
-			helpBody += '&#185; without empty lines and whitespaces&#178; from both sides of the lines<br>'; <!-- &#185; ¹  &#178; ² -->
-			helpBody += '&#178; spaces, tabs and others<br><br>'; <!-- &#178; ² -->
+			helpBody += '&#185; without empty lines and whitespaces&#178; from both sides of the lines<br>'; // &#185; ¹  &#178; ²
+			helpBody += '&#178; spaces, tabs and others<br><br>'; // &#178; ²
 			break;
 		default:
 			var helpHeader = '¤¤¤';
@@ -114,6 +122,18 @@ document.onkeydown = function(evt) {
 		}
     }
 }; // event document.onkeydown
+
+function showMessage(msgText) {
+	var msgCode = '<br><div class="msgBox">';
+	msgCode += '<div style="text-align: right;"><a href="javascript:clearMessage()" style="text-decoration: none"> &nbsp; &nbsp; &nbsp; x &nbsp; &nbsp; &nbsp; </a></div>';
+	msgCode += msgText;
+	msgCode += '<br></div>';
+	document.getElementById('idMessage').innerHTML = msgCode;
+} // function showMessage
+
+function clearMessage() {
+	document.getElementById('idMessage').innerHTML = '';
+} // function clearMessage
 
 function openListMenu(table) {
 	// table: 'Input', 'Output'
@@ -259,18 +279,37 @@ function tableEdit(table, operation) {
 		let cellID = (table == 'Input') ? getCellName(table, i) : i;
 		countLines('List' + cellID);
 	}
+	if (operation == 'add') {
+		updateCheckboxesBothLines();
+	}
 }
   
-function getArea(area, type) {
-	var areaArray = ['edit', 'sort', 'duplicates', 'set theory', 'compare'];
+function getArea(level, area, type) {
+	// level: 'top', 'sub'
+	var areaArray = (level == 'top')
+		? ['edit', 'sort', 'duplicates', 'set theory', 'compare']
+		: ['trim', 'case', 'repeat', 'split', 'join'];
 	var descriptionArray = ['Edit', 'Sort', 'Duplicates', 'Set Theory', 'Compare'];
-	var buttonIdArray = ['idButtonEdit', 'idButtonSort', 'idButtonDuplicates', 'idButtonSetTheory', 'idButtonCompare']
-	var areaIdArray = ['idEditArea', 'idSortArea', 'idDuplicatesArea', 'idSetTheoryArea', 'idCompareArea'];
+	var buttonIdArray = (level == 'top')
+		? ['idButtonEdit', 'idButtonSort', 'idButtonDuplicates', 'idButtonSetTheory', 'idButtonCompare']
+		: ['idButtonTrim', 'idButtonCase', 'idButtonRepeat', 'idButtonSplit', 'idButtonJoin'];
+	var areaIdArray = (level == 'top')
+		? ['idEditArea', 'idSortArea', 'idDuplicatesArea', 'idSetTheoryArea', 'idCompareArea']
+		: ['idTrimArea', 'idCaseArea', 'idRepeatArea', 'idSplitArea', 'idJoinArea'];
 	var pos = areaArray.indexOf(area);
 	if (type == 'allAreaIds') {
 		return areaIdArray;
 	} else if (pos == -1) {
-		alert('Error: \'' + area + '\' not found (area in function getArea)');
+		if (type == 'area') {
+			pos = buttonIdArray.indexOf(area);
+			if (pos == -1) {
+				alert('Error:\n\'' + area + '\' not found\n(button-id in function getArea)');
+			} else {
+				return areaArray[pos];
+			}
+		} else {
+			alert('Error:\n\'' + area + '\' not found\n(area in function getArea)');
+		}
 	} else if (type == 'description') {
 		return descriptionArray[pos];
 	} else if (type == 'buttonId') {
@@ -283,33 +322,233 @@ function getArea(area, type) {
 } // function getArea
 
 function calcBreadcrumbs(area) { // ### unused
-	var jscode = 'javascript:selectAreaButton(\'(' + area + ')\')';
-	var htmlcode = '<a href="' + jscode + '">Actions</a> &nbsp; &#10139; &nbsp; ' + getArea(area, 'description') + '<br />';
+	var jscode = "javascript:selectAreaButton('top', '(" + area + ")')";
+	var htmlcode = '<a href="' + jscode + '">Actions</a> &nbsp; &#10139; &nbsp; ' + getArea('top', area, 'description') + '<br />';
 	return htmlcode;
 } // function calcBreadcrumbs
 
-function selectAreaButton(area) {
+function selectAreaButton(level, area) {
+	// level: 'top', 'sub'
+	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare',   'trim', 'case', 'repeat', 'split', 'join'
+	const className = {
+		top: 'pressedActionTopButton',
+		sub: 'pressedActionSubButton'
+	}
 	if (area.charAt(0) != '(') { // if action-button pressed
-		var coll = document.getElementsByClassName('pressedButton');
+		var coll = document.getElementsByClassName(className[level]);
 		for (let i = coll.length-1; i >= 0; i--) {
-			coll[i].classList.remove('pressedButton');
+			coll[i].classList.remove(className[level]);
 		}
-		var allAreaIds = getArea('', 'allAreaIds');
+		var allAreaIds = getArea(level, '', 'allAreaIds');
 		for (let i = 0; i < allAreaIds.length; i++) {
 			document.getElementById( allAreaIds[i] ).style.display = 'none';
 		}
 		// document.getElementById('ActionArea').style.display = 'none';
-		document.getElementById( getArea(area, 'buttonId') ).classList.add('pressedButton');
+		document.getElementById( getArea(level, area, 'buttonId') ).classList.add(className[level]);
 		// document.getElementById('BreadcrumbsArea').innerHTML = calcBreadcrumbs (area);
 		// document.getElementById('BreadcrumbsArea').style.display = 'inline';
-		document.getElementById( getArea(area, 'areaId') ).style.display = 'inline';
+		document.getElementById( getArea(level, area, 'areaId') ).style.display = 'inline';
 	} else { // if breadcrumbs-link pressed // ### unused
 		document.getElementById('ActionArea').style.display = 'inline';
 		document.getElementById('BreadcrumbsArea').style.display = 'none';
 		document.getElementById('BreadcrumbsArea').innerHTML = ' ';
-		document.getElementById( getArea(area.slice(1, -1), 'areaId') ).style.display = 'none';
+		document.getElementById( getArea(level, area.slice(1, -1), 'areaId') ).style.display = 'none';
 	} // if breadcrumbs-link pressed
+	if (level == 'top') {
+		if (area == 'edit' && activeSubButton == '') {
+			document.getElementById('idInOut').innerHTML = '';
+		} else {
+			showInOutCheckboxes(area);
+		}
+	} else {
+		if (activeSubButton == '') {
+			showInOutCheckboxes('edit');
+		}
+		activeSubButton = area;
+	}
+	clearMessage();
 } // function selectAreaButton
+
+function updateCheckboxesBothLines() {
+	var coll = document.getElementsByClassName('pressedActionTopButton');
+	if (coll.length == 0) {
+		// do nothing (still no action button pressed)
+	} else if (coll.length == 1) {
+		var typeArray = ['Input', 'Output'];
+		var area = getArea('top', coll[0].id, 'area');
+		var requiredAmounts = InOutAmounts[area].split('_');
+		var short;
+		for (let i=0; i<=1; i++) {
+			short = (document.getElementById('id' + typeArray[i] + 'OtherLabel').style.display == 'none') ? false : true;
+			updateCheckboxesOneLine(typeArray[i], requiredAmounts[i], short);
+		}
+	} else {
+		alert('Warning:\nInput and output checkboxes could not be updated.\n'
+			+ '(Amount of pressed buttons: ' + coll.length + ')');
+	}
+}
+
+function updateCheckboxesOneLine (type, requiredAmount, short) {
+	// type: 'Input', 'Output'
+	// short: true: only usual lists, false: all lists
+	var tickedIdArray = [];
+	// get current selections
+	var tickedBoxList = document.querySelectorAll('input[name="' + type + 'Boxes"]:checked')
+	for (let i=0; i<tickedBoxList.length; i++) {
+		tickedIdArray.push(tickedBoxList[i].id.substring(('id'+type+'-').length))
+	}
+	document.getElementById('id' + type + 'Boxes').innerHTML = 
+		getInOutCheckboxes(type, requiredAmount, tickedIdArray.join('_'), short);
+	onchangeInOutCheckboxes(type, requiredAmount);
+}
+
+function onchangeInOutCheckboxes(type, requiredAmount)  {
+	// type: 'Input', 'Output'
+	var msg;
+	var activeGoButton = false;
+	var typeOther = (type == 'Input') ? 'Output' : 'Input';
+	if (document.getElementById('id' + type + 'Other').checked) {
+		updateCheckboxesOneLine(type, requiredAmount, false);
+	} else {
+		if (document.querySelectorAll('input[name="' + type + 'Boxes"]:checked').length == requiredAmount) {
+			msg = '';
+			if (document.getElementById(typeOther + 'Msg').innerHTML == '') {
+				activeGoButton = true;
+			}
+		} else {
+			msg = ' &nbsp; &nbsp; &nbsp; Please select ' + requiredAmount + ' lists';
+		}
+		document.getElementById(type + 'Msg').innerHTML = msg;
+		if (activeGoButton) {
+			document.getElementById('idButtonGo').classList.remove('pressedGoButton');
+		} else {
+			document.getElementById('idButtonGo').classList.add('pressedGoButton');
+		}
+	}
+}
+
+function getInOutCheckboxes(type, requiredAmount, tickedIdString, short) {
+	// type: 'Input', 'Output'
+	// short: true: only usual lists, false: all lists
+	var tickedIds = tickedIdString.split('_');
+	var typeArray = [];
+	typeArray[0] = type;
+	if (!short) {
+		typeArray[1] = (type == 'Input') ? 'Output' : 'Input';
+	}
+	var ticked;
+	var id;
+	var parameter;
+	var code = '';
+	for (let j=0; j<typeArray.length; j++) {
+		code += (j==1) ? ' &nbsp; &nbsp; &nbsp; ' : '';
+		for (let i=1; i<=cellAmountObj[typeArray[j]]; i++) {
+			id = 'id' + type + '-' + typeArray[j] + '-' + i;
+			parameter = "'" + type + "', " + requiredAmount;
+			ticked = (tickedIds.includes(typeArray[j]+'-'+i)) ? ' checked="checked"' : '';
+			code += '<label>';
+			code += '  <input type="checkbox" name="' + type + 'Boxes" id="' + id + '"';
+			code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"' + ticked + '> ';
+			code += getCellName(typeArray[j], i);
+			code += '</label> &nbsp; ';
+		}
+	}
+	var style = (short) ? '' : ' style="display: none"';
+	code += '<label id="id' + type + 'OtherLabel"' + style + '> &nbsp; &nbsp; &nbsp; ';
+	code += '  <input type="checkbox" id="id' + type + 'Other"';
+	code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"> ';
+	code += (type == 'Input') ? ' output lists' : ' input lists';
+	code += '</label> &nbsp; ';
+	code += '<span id="' + type + 'Msg"></span>';
+	return code;
+}
+function getProgressiveNumberString(type, end) {
+	// type: 'Input', 'Output'
+	var array = [];
+	for (var i = 1; i <= end; i++) {
+		array.push(type + '-' + i);
+	}
+	return array.join('_');
+}
+
+function showInOutCheckboxes(area) {
+	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare'
+	var typeArray = ['Input', 'Output'];
+	var requiredAmounts = InOutAmounts[area].split('_');
+	var tickedIdString;
+	var code;
+	code = '<table>';
+	for (let i=0; i<=1; i++) {
+		code += '  <tr>';
+		code += '    <td>' + typeArray[i] + '</td>';
+		code += '    <td id="id' + typeArray[i] + 'Boxes">';
+		tickedIdString = getProgressiveNumberString(typeArray[i], requiredAmounts[i]);
+		code +=        getInOutCheckboxes(typeArray[i], requiredAmounts[i], tickedIdString, true);
+		code += '    </td>';
+		code += '  </tr>';
+	}
+	code += '  <tr>';
+	code += '    <td colspan="2">';
+	code += '      <button id="idButtonGo" onclick="goButton(' + `'` + area + `'` + ')">Go</button>';
+	code += '    </td>';
+	code += '  </tr>';
+	code += '</table>';
+	document.getElementById('idInOut').innerHTML = code;
+}
+
+function goButton(area) {
+	if (! document.getElementById('idButtonGo').classList.contains('pressedGoButton')) {
+		var InOutArray = []; // two-dimensional array to store and pass IDs of ticks
+		var typeArray = ['Input', 'Output'];
+		var nodeList;
+		var idPartsArray = [];
+		for (let i = 0; i < typeArray.length; i++) {
+			InOutArray[i] = [];
+			nodeList = document.querySelectorAll('input[name="' + typeArray[i] + 'Boxes"]:checked')
+			for (let j = 0; j < nodeList.length; j++) {
+				idPartsArray = nodeList[j].id.split('-');
+				if (idPartsArray[1] == 'Input') {
+					InOutArray[i][j] = 'List' + getCellName('Input', idPartsArray[2]);
+				} else {
+					InOutArray[i][j] = 'List' + idPartsArray[2];
+				}
+			}
+		}
+		switch (area) {
+			case 'edit':
+				switch (activeSubButton) {
+					case 'trim':
+						trim(InOutArray[0], InOutArray[1]);
+						break;
+					case 'case':
+						cases(InOutArray[0], InOutArray[1]);
+						break;
+					case 'repeat':
+						repeat(InOutArray[0], InOutArray[1]);
+						break;
+					case 'split':
+						split(InOutArray[0], InOutArray[1]);
+						break;
+					case 'join':
+						join(InOutArray[0], InOutArray[1]);
+						break;
+				}
+				break;
+			case 'sort':
+				sort(InOutArray[0], InOutArray[1]);
+				break;
+			case 'duplicates':
+				searchDuplicates(InOutArray[0], InOutArray[1]);
+				break;
+			case 'set theory':
+				setTheory(InOutArray[0], InOutArray[1]);
+				break;
+			case 'compare':
+				compare(InOutArray[0], InOutArray[1]);
+				break;
+		}
+	}
+}
 
 function countLines(fieldId) {
 	var counter;
@@ -347,20 +586,10 @@ function trimBlanksLines(array) {
 	return trimmed;
 } // function trimBlanksLines
 
-function trim() {
-	document.getElementById('List1').value = trimBlanksLines( document.getElementById('ListA').value.split('\n') ).join('\n');
-	countLines('List1');
+function trim(inArray, outArray) {
+	document.getElementById(outArray[0]).value = trimBlanksLines( document.getElementById(inArray[0]).value.split('\n') ).join('\n');
+	countLines(outArray[0]);
 } // function trim
-
-function lowercase() {
-	document.getElementById('List1').value = document.getElementById('ListA').value.toLowerCase();
-	countLines('List1');
-} // function lowercase
-
-function uppercase() {
-	document.getElementById('List1').value = document.getElementById('ListA').value.toUpperCase();
-	countLines('List1');
-} // function uppercase
 
 function isLetterOrHighChar(char) {
 	var code = char.charCodeAt(0);
@@ -375,41 +604,57 @@ function isLetterOrHighChar(char) {
 	}
 } // function isLetterOrHighChar
 
-function propercase() {
-	var inputStr = document.getElementById('ListA').value;
+function cases(inArray, outArray) {
+	var inputStr = document.getElementById(inArray[0]).value;
 	var outputStr = '';
-	for (let i = 0; i < inputStr.length; i++ ) { // loop through list
-		if (i == 0) {
-			outputStr = outputStr + (inputStr.charAt(i)).toUpperCase();
-		} else if (isLetterOrHighChar(inputStr.charAt(i)) && ! isLetterOrHighChar(inputStr.charAt(i-1))) {
-			outputStr = outputStr + (inputStr.charAt(i)).toUpperCase();
-		} else {
-			outputStr = outputStr + (inputStr.charAt(i)).toLowerCase();
-		}
-	} // loop through list
-	document.getElementById('List1').value = outputStr;
-	countLines('List1');
-} // function propercase
+	if (document.getElementById('idCaseLower').checked == false 
+		&& document.getElementById('idCaseUpper').checked == false
+		&& document.getElementById('idCaseProper').checked == false) { // no option selected
+		alert('Please select an option.');
+	} // no option selected
+	
+	if (document.getElementById('idCaseLower').checked) {
+		outputStr = inputStr.toLowerCase();
+	}
+	
+	if (document.getElementById('idCaseUpper').checked) {
+		outputStr = inputStr.toUpperCase();
+	}
+	
+	if (document.getElementById('idCaseProper').checked) {
+		for (let i = 0; i < inputStr.length; i++ ) { // loop through list
+			if (i == 0) {
+				outputStr = outputStr + (inputStr.charAt(i)).toUpperCase();
+			} else if (isLetterOrHighChar(inputStr.charAt(i)) && ! isLetterOrHighChar(inputStr.charAt(i-1))) {
+				outputStr = outputStr + (inputStr.charAt(i)).toUpperCase();
+			} else {
+				outputStr = outputStr + (inputStr.charAt(i)).toLowerCase();
+			}
+		} // loop through list
+	}
+	document.getElementById(outArray[0]).value = outputStr;
+	countLines(outArray[0]);
+} // function cases
 
-function repeat() {
+function repeat(inArray, outArray) {
 	var amount = document.getElementById('RepeatTimes').value;
-	var ListAArray = document.getElementById('ListA').value.split('\n');
+	var ListAArray = document.getElementById(inArray[0]).value.split('\n');
 	var resultArray = [];
 	for (let i = 0; i < ListAArray.length; i++ ) { // loop through list
 		resultArray.push(ListAArray[i].repeat(amount));
 	} // loop through list
-	document.getElementById('List1').value = resultArray.join('\n');
-	countLines('List1');
+	document.getElementById(outArray[0]).value = resultArray.join('\n');
+	countLines(outArray[0]);
 } // function repeat
 
-function split() {
+function split(inArray, outArray) {
 	var delimiter = document.getElementById('SplitDelimiter').value;
 	var doMasking = document.getElementById('SplitMasking').checked;
-	document.getElementById('splitErrorMsg').innerHTML = '';
+	clearMessage();
 	if (doMasking) { // with activated masking
 		// mixture of masked und unmasked parts are OK
 		// masked parts with mask character in the middle is not allowed and the position is reported
-		var textSource = document.getElementById('ListA').value;
+		var textSource = document.getElementById(inArray[0]).value;
 		var maskingChar = document.getElementById('SplitMaskingChar').value;
 		var deliLen = delimiter.length;
 		var maskLen = maskingChar.length;
@@ -422,7 +667,7 @@ function split() {
 		// unmasked: in next loop: unmasked chars of part or ending mask expected
 		// end:      in next loop: delimiter expected, because of ending mask
 		var allOK = true;
-		var errorMsg = '<br/>Incorrect masks:';
+		var errorMsg = 'Incorrect masks:';
 		for (i = 0; i < textSource.length; i++) { // looping through string
 			// until end of block is looped and then the block is copied to target
 			// (seen afterwards: char by char would have been probably easier)
@@ -438,7 +683,7 @@ function split() {
 				} else if (status == 'end') { // mask char after masking
 					i = i + maskLen - 1;
 					allOK = false;
-					errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
+					errorMsg += '<div class="indentText">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
 					status = 'unmasked'
 				}
 			} else if (textSource.substr(i, deliLen) == delimiter) {
@@ -465,7 +710,7 @@ function split() {
 					status = 'unmasked'
 				} else if (status == 'end') { // char after masking
 					allOK = false;
-					errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
+					errorMsg += '<div class="indentText">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
 					status = 'unmasked'
 				} else { // looping through part (status: masked and unmasked)
 					// skip
@@ -474,18 +719,18 @@ function split() {
 		} // looping through string
 		if (status == 'masked') {
 			allOK = false;
-			errorMsg += '<div style="padding-left: 30px;">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
+			errorMsg += '<div class="indentText">' + posPartStart.toString() + ' .. ' + (i).toString() + '</div>';
 		} else if (status == 'unmasked') {
 			textOut += textSource.substring( posPartStart, i );
 		}
-		document.getElementById('List1').value = textOut;
+		document.getElementById(outArray[0]).value = textOut;
 		if (!(allOK)) {
-			document.getElementById('splitErrorMsg').innerHTML = errorMsg;
+			showMessage('<span class="redText">' + errorMsg + '</span>');
 		}
 	} else { // withOut activated masking
-		document.getElementById('List1').value = document.getElementById('ListA').value.split(delimiter).join('\n');
+		document.getElementById(outArray[0]).value = document.getElementById(inArray[0]).value.split(delimiter).join('\n');
 	} // withOut activated masking
-	countLines('List1');
+	countLines(outArray[0]);
 } // function split
 
 function prepend_append(textWithLinebreaks, preText, postText) {
@@ -501,19 +746,19 @@ function prepend_append(textWithLinebreaks, preText, postText) {
 	return newtextWithLinebreaks;
 } // function prepend_append
 
-function join() {
+function join(inArray, outArray) {
 	var delimiter = document.getElementById('JoinDelimiter').value;
 	var doMasking = document.getElementById('JoinMasking').checked;
 	if (doMasking) { // with masking
-		document.getElementById('List1').value = prepend_append( document.getElementById('ListA').value, document.getElementById('JoinMaskingChar').value, document.getElementById('JoinMaskingChar').value ).split('\n').join(delimiter);
+		document.getElementById(outArray[0]).value = prepend_append( document.getElementById(inArray[0]).value, document.getElementById('JoinMaskingChar').value, document.getElementById('JoinMaskingChar').value ).split('\n').join(delimiter);
 	} else { // withOut masking
-		document.getElementById('List1').value = document.getElementById('ListA').value.split('\n').join(delimiter);
+		document.getElementById(outArray[0]).value = document.getElementById(inArray[0]).value.split('\n').join(delimiter);
 	} // withOut masking
-	countLines('List1');
+	countLines(outArray[0]);
 } // function join
 
-function sort() {
-	var ListAArray = document.getElementById('ListA').value.split('\n');
+function sort(inArray, outArray) {
+	var ListAArray = document.getElementById(inArray[0]).value.split('\n');
 	if (document.getElementById('idSortAlpha').checked) { // alphabetical
 		ListAArray.sort(function(a, b){
     		if(a.toLowerCase() < b.toLowerCase()) { return -1; }
@@ -523,12 +768,12 @@ function sort() {
 	} else if (document.getElementById('idSortAscii').checked) { // ASCII
 		ListAArray.sort();
 	} // ASCII
-	document.getElementById('List1').value = ListAArray.join('\n');
-	countLines('List1');
+	document.getElementById(outArray[0]).value = ListAArray.join('\n');
+	countLines(outArray.join('_'));
 } // function sort
 
-function searchDuplicates() {
-	var ListAArray = document.getElementById('ListA').value.split('\n');
+function searchDuplicates(inArray, outArray) {
+	var ListAArray = document.getElementById(inArray[0]).value.split('\n');
 	var onlySingles = document.getElementById('duplicatesOnlySingles').checked;
 	var len = ListAArray.length;
 	var UniqueList = [];
@@ -549,18 +794,18 @@ function searchDuplicates() {
 			} // found -> n-th occurance
 		} // singles + first occurance
 	} // loop through list
-	document.getElementById('List1').value = UniqueList.join('\n');
-	document.getElementById('List2').value = DuplicatesList.join('\n');
-	countLinesX('List1_List2');
+	document.getElementById(outArray[0]).value = UniqueList.join('\n');
+	document.getElementById(outArray[1]).value = DuplicatesList.join('\n');
+	countLinesX(outArray.join('_'));
 } // function searchDuplicates
 
-function setTheory() {
+function setTheory(inArray, outArray) {
 	// Schnittmenge _ intersection of A and B
 	// Differenzmenge A \ B
 	// Symmetrische Differenz _ symmetric difference of A and B
 	// Vereinigungsmenge _ union of A and B
-	var ListAArray = document.getElementById('ListA').value.split('\n');
-	var ListBArray = document.getElementById('ListB').value.split('\n');
+	var ListAArray = document.getElementById(inArray[0]).value.split('\n');
+	var ListBArray = document.getElementById(inArray[1]).value.split('\n');
 	var lenA = ListAArray.length;
 	var lenB = ListBArray.length;
 	var DifferenzmengeA = []; // relative complement of B in A
@@ -589,9 +834,9 @@ function setTheory() {
 				DifferenzmengeB.push(ListBArray[i]);
 			} // not found -> Differenzmenge
 		} // loop through list B
-		document.getElementById('List1').value = DifferenzmengeA.join('\n');
-		document.getElementById('List2').value = Schnittmenge.join('\n');
-		document.getElementById('List3').value = DifferenzmengeB.join('\n');
+		document.getElementById(outArray[0]).value = DifferenzmengeA.join('\n');
+		document.getElementById(outArray[1]).value = Schnittmenge.join('\n');
+		document.getElementById(outArray[2]).value = DifferenzmengeB.join('\n');
 	} // intersection and difference sets
 
 	if (document.getElementById('idSetTheoryUnion').checked) { // union set
@@ -605,7 +850,7 @@ function setTheory() {
 				Vereinigungsmenge.push(ListBArray[i]);
 			} // not found -> first occurance
 		} // loop through list B
-		document.getElementById('List1').value = Vereinigungsmenge.join('\n');
+		document.getElementById(outArray[0]).value = Vereinigungsmenge.join('\n');
 	} // union set
 	
 	if (document.getElementById('idSetTheorySymmDiff').checked) { // symmetric difference set
@@ -619,20 +864,16 @@ function setTheory() {
 				SymDiffmenge.push(ListBArray[i]);
 			} // not found -> first occurance
 		} // loop through list A
-		document.getElementById('List1').value = SymDiffmenge.join('\n');
+		document.getElementById(outArray[0]).value = SymDiffmenge.join('\n');
 	} // symmetric difference set
 	
-	countLinesX('List1_List2_List3');
+	countLinesX(outArray.join('_'));
 } // function setTheory
 
-function clearCompareResult() {
-	document.getElementById('compareResult').innerHTML = '';
-} // function clearCompareResult
-
-function compare() {
+function compare(inArray, outArray) {
 	var showDetails = document.getElementById('compareDetails').checked;
-	var ListA_Value = document.getElementById('ListA').value;
-	var ListB_Value = document.getElementById('ListB').value;
+	var ListA_Value = document.getElementById(inArray[0]).value;
+	var ListB_Value = document.getElementById(inArray[1]).value;
 	var ListA_Array = ListA_Value.split('\n');
 	var ListB_Array = ListB_Value.split('\n');
 	var ListA_ArrayLowerCase = ListA_Value.toLowerCase();
@@ -643,11 +884,9 @@ function compare() {
 	var ListB_ValueTrimmed = ListB_ArrayTrimmed.join('\n');
 	var ListA_ArrayLowerCaseTrimmed = ListA_ValueTrimmed.toLowerCase();
 	var ListB_ArrayLowerCaseTrimmed = ListB_ValueTrimmed.toLowerCase();
-	var result;
+	var result = '';
 	var detailsA = '';
 	var detailsB = '';
-	result = '<br><div class="compareResult">';
-	result += '<div style="text-align: right;"><a href="javascript:clearCompareResult()" style="text-decoration: none"> &nbsp; &nbsp; &nbsp; x &nbsp; &nbsp; &nbsp; </a></div>';
 	if( ListA_Value == ListB_Value ) {
 		result += 'Both lists are 100 % identical.';
 	} else {
@@ -677,7 +916,7 @@ function compare() {
 		detailsA += '# of lines: ' + ListA_ArrayTrimmed.length + '\n';
 		detailsA += '# of char: ' + ListA_ValueTrimmed.length + '\n';
 		detailsA += '# of char without linebreaks: ' + (ListA_ValueTrimmed.length - ListA_ArrayTrimmed.length + 1);
-		document.getElementById('List1').value = detailsA;
+		document.getElementById(outArray[0]).value = detailsA;
 		detailsB = '# of lines: ' + ListB_Array.length + '\n';
 		detailsB += '# of char: ' + ListB_Value.length + '\n';
 		detailsB += '# of char without linebreaks: ' + (ListB_Value.length - ListB_Array.length + 1) + '\n\n';
@@ -685,9 +924,8 @@ function compare() {
 		detailsB += '# of lines: ' + ListB_ArrayTrimmed.length + '\n';
 		detailsB += '# of char: ' + ListB_ValueTrimmed.length + '\n';
 		detailsB += '# of char without linebreaks: ' + (ListB_ValueTrimmed.length - ListB_ArrayTrimmed.length + 1);
-		document.getElementById('List2').value = detailsB;
+		document.getElementById(outArray[1]).value = detailsB;
 	}
-	result += '<br><br></div>';
-	document.getElementById('compareResult').innerHTML = result;
-	countLinesX('List1_List2');
+	showMessage(result + '<br>');
+	countLinesX(outArray.join('_'));
 } // function compare
