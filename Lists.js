@@ -10,7 +10,9 @@ const InOutAmounts = {
 	edit: '1_1',
 	sort: '1_1',
 	duplicates: '1_2',
-	'set theory': '2_3',
+	SetTheoryInterDiff: '2_3',
+	SetTheoryUnion: '2_1',
+	SetTheorySymmDiff: '2_1',
 	compare: '2_2'
 };
 var helpStatusActive = false;  // needed to close with ESC
@@ -369,16 +371,23 @@ function selectAreaButton(level, area) {
 	clearMessage();
 } // function selectAreaButton
 
+function onchangeSetTheoryOptions() {
+	showInOutCheckboxes('set theory');
+}
+
 function updateCheckboxesBothLines() {
 	var coll = document.getElementsByClassName('pressedActionTopButton');
 	if (coll.length == 0) {
-		// do nothing (still no action button pressed)
+		// do nothing (action button still not pressed)
 	} else if (coll.length == 1) {
 		var typeArray = ['Input', 'Output'];
 		var area = getArea('top', coll[0].id, 'area');
+		if (area == 'set theory') {
+			area = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+		}
 		var requiredAmounts = InOutAmounts[area].split('_');
 		var short;
-		for (let i=0; i<=1; i++) {
+		for (let i=0; i<=1; i++) { // loop through Input and Output
 			short = (document.getElementById('id' + typeArray[i] + 'OtherLabel').style.display == 'none') ? false : true;
 			updateCheckboxesOneLine(typeArray[i], requiredAmounts[i], short);
 		}
@@ -474,6 +483,9 @@ function getProgressiveNumberString(type, end) {
 function showInOutCheckboxes(area) {
 	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare'
 	var typeArray = ['Input', 'Output'];
+	if (area == 'set theory') {
+		area = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+	}
 	var requiredAmounts = InOutAmounts[area].split('_');
 	var tickedIdString;
 	var code;
