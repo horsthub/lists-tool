@@ -552,7 +552,9 @@ function goButton(area) {
 			case 'duplicates':
 				searchDuplicates(InOutArray[0], InOutArray[1]);
 				break;
-			case 'set theory':
+			case 'SetTheoryInterDiff':
+			case 'SetTheoryUnion':
+			case 'SetTheorySymmDiff':
 				setTheory(InOutArray[0], InOutArray[1]);
 				break;
 			case 'compare':
