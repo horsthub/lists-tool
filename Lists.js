@@ -436,39 +436,39 @@ function onchangeInOutCheckboxes(type, requiredAmount)  {
 	}
 }
 
-function getInOutCheckboxes(type, requiredAmount, tickedIdString, short) {
-	// type: 'Input', 'Output'
+function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
+	// typeInOut: 'Input', 'Output'
 	// short: true: only usual lists, false: all lists
 	var tickedIds = tickedIdString.split('_');
 	var typeArray = [];
-	typeArray[0] = type;
+	typeArray[0] = typeInOut;
 	if (!short) {
-		typeArray[1] = (type == 'Input') ? 'Output' : 'Input';
+		typeArray[1] = (typeInOut == 'Input') ? 'Output' : 'Input';
 	}
-	var ticked;
 	var id;
+	var ticked;
 	var parameter;
 	var code = '';
 	for (let j=0; j<typeArray.length; j++) {
 		code += (j==1) ? ' &nbsp; &nbsp; &nbsp; ' : '';
 		for (let i=1; i<=cellAmountObj[typeArray[j]]; i++) {
-			id = 'id' + type + '-' + typeArray[j] + '-' + i;
-			parameter = "'" + type + "', " + requiredAmount;
+			id = 'id' + typeInOut + '-' + typeArray[j] + '-' + i;
+			parameter = "'" + typeInOut + "', " + requiredAmount;
 			ticked = (tickedIds.includes(typeArray[j]+'-'+i)) ? ' checked="checked"' : '';
 			code += '<label>';
-			code += '  <input type="checkbox" name="' + type + 'Boxes" id="' + id + '"';
+			code += '  <input type="checkbox" name="' + typeInOut + 'Boxes" id="' + id + '"';
 			code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"' + ticked + '> ';
 			code += getCellName(typeArray[j], i);
 			code += '</label> &nbsp; ';
 		}
 	}
 	var style = (short) ? '' : ' style="display: none"';
-	code += '<label id="id' + type + 'OtherLabel"' + style + '> &nbsp; &nbsp; &nbsp; ';
-	code += '  <input type="checkbox" id="id' + type + 'Other"';
+	code += '<label id="id' + typeInOut + 'OtherLabel"' + style + '> &nbsp; &nbsp; &nbsp; ';
+	code += '  <input type="checkbox" id="id' + typeInOut + 'Other"';
 	code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"> ';
-	code += (type == 'Input') ? ' output lists' : ' input lists';
+	code += (typeInOut == 'Input') ? ' output lists' : ' input lists';
 	code += '</label> &nbsp; ';
-	code += '<span id="' + type + 'Msg"></span>';
+	code += '<span id="' + typeInOut + 'Msg"></span>';
 	return code;
 }
 function getProgressiveNumberString(type, end) {
