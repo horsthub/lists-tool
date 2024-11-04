@@ -445,6 +445,7 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	if (!short) {
 		typeArray[1] = (typeInOut == 'Input') ? 'Output' : 'Input';
 	}
+	var typeCheckboxRadio = (requiredAmount == 1) ? 'type="radio"' : 'type="checkbox"';
 	var id;
 	var ticked;
 	var parameter;
@@ -456,7 +457,7 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 			parameter = "'" + typeInOut + "', " + requiredAmount;
 			ticked = (tickedIds.includes(typeArray[j]+'-'+i)) ? ' checked="checked"' : '';
 			code += '<label>';
-			code += '  <input type="checkbox" name="' + typeInOut + 'Boxes" id="' + id + '"';
+			code += '  <input ' + typeCheckboxRadio + ' name="' + typeInOut + 'Boxes" id="' + id + '"';
 			code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"' + ticked + '> ';
 			code += getCellName(typeArray[j], i);
 			code += '</label> &nbsp; ';
@@ -471,6 +472,7 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	code += '<span id="' + typeInOut + 'Msg"></span>';
 	return code;
 }
+
 function getProgressiveNumberString(type, end) {
 	// type: 'Input', 'Output'
 	var array = [];
