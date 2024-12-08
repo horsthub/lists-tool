@@ -1,0 +1,15 @@
+<svg width="120" height="90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    path {
+      stroke: none;
+      fill: black;
+    }
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: white;
+      }
+    }
+  </style>
+  <path d="M0,30 h20 v10 h-10 v40 h100 v-40 h-10 v-10 h20 v60 h-120 z" />
+  <path d="M60,70 l-20,-20 h10 v-50 h20 v50 h10 z" />
+</svg>

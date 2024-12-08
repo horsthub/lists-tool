@@ -34,7 +34,13 @@ function showHelp(helpType) {
 	switch(helpType) {
 		case 'overall':
 			var helpHeader = '<b>Lists Tool</b>';
-			var helpBody = 'The line counters are updated:<br>';
+			var helpBody = 'List names:<br><br>';
+			helpBody += ' &nbsp; &nbsp; List A: the action does not use this list<br>';
+			helpBody += ' &nbsp; &nbsp; <img src="icon-input.svg" class="img-input-output" /> A: the action uses this list as input<br>';
+			helpBody += ' &nbsp; &nbsp; <img src="icon-output.svg" class="img-input-output" /> A: the action outputs to this list<br>';
+			helpBody += ' &nbsp; &nbsp; <img src="icon-input-output.svg" class="img-input-output" /> A: the action uses this list as input and outputs to this list<br>';
+			helpBody += '<br>';
+			helpBody += 'The line counters are updated:<br>';
 			helpBody += '<ul>';
 			helpBody += '  <li>immediately:</li>';
 			helpBody += '    <ul>';
@@ -45,7 +51,9 @@ function showHelp(helpType) {
 			helpBody += '    <ul>';
 			helpBody += '      <li>by pasting with context menu</li>';
 			helpBody += '    </ul>';
-			helpBody += '</ul><br>';
+			helpBody += '</ul>';
+			helpBody += 'Hotkeys:<br><br>';
+			helpBody += ' &nbsp; &nbsp; Esc: close all dialogs (list actions and help)<br><br><br>';
 			break;
 		case 'Duplicates':
 			var helpHeader = '<b>Duplicates</b>';
@@ -256,7 +264,9 @@ function tableEdit(table, operation) {
 		code += getRowTagByColAndCellAndTotal('start', col, i, cellAmountNew);
 		// cell with fields and values
 		code +='<div class="td">';
-		code += '<a href="javascript:clearList(' + cellParameter + ')" class="blackNoUnderline">List ' + cellName + '</a>';
+		code += '<a href="javascript:clearList(' + cellParameter + ')" class="blackNoUnderline">';
+		code +=  '<span id="idCellName' + cellID + '">List</span> ' + cellName;
+		code += '</a>';
 		code += '<input type="text" id="Descr' + cellID + '" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
 		code += '<span id=CounterList' + cellID + '></span> <br />';
 		code += '<textarea id="List' + cellID + '" cols="38" rows="10"';
@@ -281,8 +291,20 @@ function tableEdit(table, operation) {
 		let cellID = (table == 'Input') ? getCellName(table, i) : i;
 		countLines('List' + cellID);
 	}
+	// update input output radio buttons
 	if (operation == 'add') {
-		updateCheckboxesBothLines();
+		updateCheckboxesBothLines(); // in the function is checked if update is necessary
+	}
+	// update list name icons
+	if (operation == 'init') {
+		// not update of icon needed
+	} else if (document.getElementsByClassName('pressedActionTopButton').length != 1) {
+		// not update of icon needed
+	} else if ( activeSubButton == '' 
+		&& document.getElementById('idButtonEdit').classList.contains('pressedActionTopButton') ) {
+		// not update of icon needed
+	} else {
+		updateListNameIcon(true);
 	}
 }
   
@@ -359,12 +381,15 @@ function selectAreaButton(level, area) {
 	if (level == 'top') {
 		if (area == 'edit' && activeSubButton == '') {
 			document.getElementById('idInOut').innerHTML = '';
+			updateListNameIcon(false);
 		} else {
 			showInOutCheckboxes(area);
+			updateListNameIcon(true);
 		}
 	} else {
 		if (activeSubButton == '') {
 			showInOutCheckboxes('edit');
+			updateListNameIcon(true);
 		}
 		activeSubButton = area;
 	}
@@ -373,6 +398,7 @@ function selectAreaButton(level, area) {
 
 function onchangeSetTheoryOptions() {
 	showInOutCheckboxes('set theory');
+	updateListNameIcon(true);
 }
 
 function updateCheckboxesBothLines() {
@@ -380,16 +406,20 @@ function updateCheckboxesBothLines() {
 	if (coll.length == 0) {
 		// do nothing (action button still not pressed)
 	} else if (coll.length == 1) {
-		var typeArray = ['Input', 'Output'];
-		var area = getArea('top', coll[0].id, 'area');
-		if (area == 'set theory') {
-			area = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
-		}
-		var requiredAmounts = InOutAmounts[area].split('_');
-		var short;
-		for (let i=0; i<=1; i++) { // loop through Input and Output
-			short = (document.getElementById('id' + typeArray[i] + 'OtherLabel').style.display == 'none') ? false : true;
-			updateCheckboxesOneLine(typeArray[i], requiredAmounts[i], short);
+		if ( ! ( document.getElementById('idButtonEdit').classList.contains('pressedActionTopButton')
+			&& activeSubButton == ''
+		)) {
+			var typeArray = ['Input', 'Output'];
+			var area = getArea('top', coll[0].id, 'area');
+			if (area == 'set theory') {
+				area = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+			}
+			var requiredAmounts = InOutAmounts[area].split('_');
+			var short;
+			for (let i=0; i<=1; i++) { // loop through Input and Output
+				short = (document.getElementById('id' + typeArray[i] + 'OtherLabel').style.display == 'none') ? false : true;
+				updateCheckboxesOneLine(typeArray[i], requiredAmounts[i], short);
+			}
 		}
 	} else {
 		alert('Warning:\nInput and output checkboxes could not be updated.\n'
@@ -408,32 +438,69 @@ function updateCheckboxesOneLine (type, requiredAmount, short) {
 	}
 	document.getElementById('id' + type + 'Boxes').innerHTML = 
 		getInOutCheckboxes(type, requiredAmount, tickedIdArray.join('_'), short);
-	onchangeInOutCheckboxes(type, requiredAmount);
+	updateMessageAndGoButton(type, requiredAmount);
 }
 
-function onchangeInOutCheckboxes(type, requiredAmount)  {
+function updateListNameIcon(showIcons) {
+	// showIcons: true (calc and show icons), false (show text 'List', when there are no input output radio buttons)
+	var typeArray = ['Input', 'Output'];
+	for (let j = 0; j < typeArray.length; j++) { // loop through 'Input' and 'Output'
+		let type = typeArray[j];
+		let cellAmount = cellAmountObj[type];
+		let typeOther = (type == 'Input') ? 'Output' : 'Input';
+		for (let i = 1; i <= cellAmount; i++) { // loop through the list fields of 'Input' and 'Output'
+			var cellID = (type == 'Input') ? getCellName(type, i) : i;
+			let code;
+			if (showIcons) {
+				let iconName = 'icon';
+				let checkboxId = 'id' + type + '-' + type + '-' + i;
+				if (document.getElementById(checkboxId).checked) { // tick in default listing
+					iconName += '-' + type.toLowerCase();
+				}
+				if (document.getElementById('id' + typeOther + 'OtherLabel').style.display == 'none') { // other lists activated?
+					checkboxId = 'id' + typeOther + '-' + type + '-' + i;
+					if (document.getElementById(checkboxId).checked) { // tick in other listing
+						iconName += '-' + typeOther.toLowerCase();
+						iconName = (iconName == 'icon-output-input') ? 'icon-input-output' : iconName;
+					}
+				}
+				iconName += '.svg';
+				code = (iconName == 'icon.svg')
+					? 'List'
+					: '<img src="' + iconName + '" class="img-input-output">';
+			} else {
+				code = 'List';
+			}
+			document.getElementById('idCellName' + cellID).innerHTML = code;
+		}
+	}
+}
+
+function updateMessageAndGoButton(type, requiredAmount)  {
 	// type: 'Input', 'Output'
 	var msg;
 	var activeGoButton = false;
 	var typeOther = (type == 'Input') ? 'Output' : 'Input';
-	if (document.getElementById('id' + type + 'Other').checked) {
-		updateCheckboxesOneLine(type, requiredAmount, false);
+	if (document.querySelectorAll('input[name="' + type + 'Boxes"]:checked').length == requiredAmount) {
+		msg = '';
+		if (document.getElementById(typeOther + 'Msg').innerHTML == '') {
+			activeGoButton = true;
+		}
 	} else {
-		if (document.querySelectorAll('input[name="' + type + 'Boxes"]:checked').length == requiredAmount) {
-			msg = '';
-			if (document.getElementById(typeOther + 'Msg').innerHTML == '') {
-				activeGoButton = true;
-			}
-		} else {
-			msg = ' &nbsp; &nbsp; &nbsp; Please select ' + requiredAmount + ' lists';
-		}
-		document.getElementById(type + 'Msg').innerHTML = msg;
-		if (activeGoButton) {
-			document.getElementById('idButtonGo').classList.remove('pressedGoButton');
-		} else {
-			document.getElementById('idButtonGo').classList.add('pressedGoButton');
-		}
+		msg = ' &nbsp; &nbsp; &nbsp; Please select ' + requiredAmount + ' lists';
 	}
+	document.getElementById(type + 'Msg').innerHTML = msg;
+	if (activeGoButton) {
+		document.getElementById('idButtonGo').classList.remove('pressedGoButton');
+	} else {
+		document.getElementById('idButtonGo').classList.add('pressedGoButton');
+	}
+}
+
+function onchangeInOutCheckboxes(type, requiredAmount) {
+	// type: 'Input', 'Output'
+	updateMessageAndGoButton(type, requiredAmount);
+	updateListNameIcon(true);
 }
 
 function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
@@ -448,13 +515,12 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	var typeCheckboxRadio = (requiredAmount == 1) ? 'type="radio"' : 'type="checkbox"';
 	var id;
 	var ticked;
-	var parameter;
+	var parameter = "'" + typeInOut + "', " + requiredAmount;
 	var code = '';
 	for (let j=0; j<typeArray.length; j++) {
 		code += (j==1) ? ' &nbsp; &nbsp; &nbsp; ' : '';
 		for (let i=1; i<=cellAmountObj[typeArray[j]]; i++) {
 			id = 'id' + typeInOut + '-' + typeArray[j] + '-' + i;
-			parameter = "'" + typeInOut + "', " + requiredAmount;
 			ticked = (tickedIds.includes(typeArray[j]+'-'+i)) ? ' checked="checked"' : '';
 			code += '<label>';
 			code += '  <input ' + typeCheckboxRadio + ' name="' + typeInOut + 'Boxes" id="' + id + '"';
@@ -466,7 +532,8 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	var style = (short) ? '' : ' style="display: none"';
 	code += '<label id="id' + typeInOut + 'OtherLabel"' + style + '> &nbsp; &nbsp; &nbsp; ';
 	code += '  <input type="checkbox" id="id' + typeInOut + 'Other"';
-	code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"> ';
+	parameter +=  ", false";
+	code += '    onchange="updateCheckboxesOneLine(' + parameter + ');"> ';
 	code += (typeInOut == 'Input') ? ' output lists' : ' input lists';
 	code += '</label> &nbsp; ';
 	code += '<span id="' + typeInOut + 'Msg"></span>';

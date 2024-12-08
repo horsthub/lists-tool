@@ -6,8 +6,8 @@
 Features:
 
 * Counting lines
-* Trimming empty lines and whitespaces from both sides of the lines 
-* Lowercase, upppercase and propercase converting 
+* Trimming empty lines and whitespaces from both sides of the lines
+* Lowercase, upppercase and propercase converting
 * Repeating of lines
 * Spliting text to lines
 * Joining lines to text

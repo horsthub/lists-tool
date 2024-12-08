@@ -65,6 +65,10 @@ div.td {
 	font-size: 100%; 
 }
 
+.img-input-output {
+	height: 1em;
+}
+
 input[type="text"].Descr {
     width: 100px;
     border: 0px /* 1px solid #ff0000 */
