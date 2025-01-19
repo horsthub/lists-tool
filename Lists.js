@@ -508,9 +508,11 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	// short: true: only usual lists, false: all lists
 	var tickedIds = tickedIdString.split('_');
 	var typeArray = [];
-	typeArray[0] = typeInOut;
-	if (!short) {
-		typeArray[1] = (typeInOut == 'Input') ? 'Output' : 'Input';
+	if (short) {
+		typeArray[0] = typeInOut;
+	} else {
+		typeArray[0] = 'Input';
+		typeArray[1] = 'Output';
 	}
 	var typeCheckboxRadio = (requiredAmount == 1) ? 'type="radio"' : 'type="checkbox"';
 	var id;
