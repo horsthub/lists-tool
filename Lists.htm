@@ -83,9 +83,21 @@
   </span>
   <!-- Edit - Join -->
   <span id="idJoinArea" style="display: none">
-    Delimiter <input type="text" id="JoinDelimiter" value="," class="littleCentered"><br />
-    <label><input type="checkbox" id="JoinMasking"> mask with </label>
-    <input type="text" id="JoinMaskingChar" value='"' class="littleCentered"><br />
+    <label><input type="radio" name="JoinOptions" id="idJoinOneList" onchange="onchangeJoinOptions()" checked="checked"> One list </label>
+    <!-- <label><input type="radio" name="JoinOptions" id="idJoinTwoLists" onchange="onchangeJoinOptions()"> two lists </label> -->
+    <label><input type="radio" name="JoinOptions" id="idJoinText" onchange="onchangeJoinOptions()"> Text </label> &nbsp;
+    <a href="javascript:showHelp('Join')" class="boldNoUnderline">?</a><br />
+    <span id="idJoinOneListArea">
+      Delimiter <input type="text" id="JoinDelimiter" value="," class="littleCentered"><br />
+      <label><input type="checkbox" id="JoinMasking"> mask with </label>
+      <input type="text" id="JoinMaskingChar" value='"' class="littleCentered"><br />
+    </span>
+    <span id="idJoinTextArea" class="hiddenFree">
+      Text <input type="text" id="JoinText" value=""><br />
+      <label><input type="radio" name="JoinTextPos" id="idJoinTextPosBefore" checked="checked"> text + element of list </label>
+      <label><input type="radio" name="JoinTextPos" id="idJoinTextPosAfter"> element of list + text </label> &nbsp;
+      <br />
+    </span>
   </span>
 </span>
 <!-- Sort -->
