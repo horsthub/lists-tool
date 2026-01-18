@@ -22,7 +22,7 @@ const InOutAmounts = {
 };
 var helpStatusActive = false;  // needed to close with ESC
 var listMenuStatus = ''; // '', 'Input', 'Output' // needed to close with ESC
-var activeSubButton = ''; // '', 'trim', 'case', 'repeat', 'split', 'join'
+var activeSubButton = ''; // '', 'trim', 'case', 'repeat', 'series', 'split', 'join'
 
 function init() {
 	tableEdit('Input', 'init');
@@ -68,6 +68,19 @@ function showHelp(helpType) {
 			helpBody += 'Leading zeros:<br>';
 			helpBody += '<span class="indentText">Length of the number with the leading zeros</span><br>';
 			helpBody += '<span class="indentText">0 = Fit length with biggest number</span><br><br>';
+			break;
+		case 'Join':
+			var helpHeader = '<b>Join</b>';
+			var helpBody = '<ul>';
+			helpBody += '  <li>One list<br>';
+			helpBody += '    The elements of one list will be joined to one text <br>';
+			helpBody += '    (separated with the delimiter).';
+			helpBody += '  </li><br>';
+			helpBody += '  <li>Text<br>';
+			helpBody += '    A text will be prepended or appended <br>';
+			helpBody += '    to each element of one list.';
+			helpBody += '  </li>';
+			helpBody += '</ul><br><br>';
 			break;
 		case 'Duplicates':
 			var helpHeader = '<b>Duplicates</b>';
@@ -404,10 +417,22 @@ function selectAreaButton(level, area) {
 		activeSubButton = area;
 		showInOutCheckboxes('edit');
 		updateListNameIcon(true);
-
 	}
 	clearMessage();
 } // function selectAreaButton
+
+function onchangeJoinOptions() {
+	document.getElementById('idJoinOneListArea').classList.add('hiddenFree');
+	document.getElementById('idJoinTextArea').classList.add('hiddenFree');
+	if (document.getElementById('idJoinOneList').checked) {
+		document.getElementById('idJoinOneListArea').classList.remove('hiddenFree');
+	}
+	if (document.getElementById('idJoinText').checked) {
+		document.getElementById('idJoinTextArea').classList.remove('hiddenFree');
+	}
+	showInOutCheckboxes('edit');
+	updateListNameIcon(true);
+}
 
 function onchangeSetTheoryOptions() {
 	showInOutCheckboxes('set theory');
@@ -906,13 +931,42 @@ function prepend_append(textWithLinebreaks, preText, postText) {
 } // function prepend_append
 
 function join(inArray, outArray) {
-	var delimiter = document.getElementById('JoinDelimiter').value;
-	var doMasking = document.getElementById('JoinMasking').checked;
-	if (doMasking) { // with masking
-		document.getElementById(outArray[0]).value = prepend_append( document.getElementById(inArray[0]).value, document.getElementById('JoinMaskingChar').value, document.getElementById('JoinMaskingChar').value ).split('\n').join(delimiter);
-	} else { // withOut masking
-		document.getElementById(outArray[0]).value = document.getElementById(inArray[0]).value.split('\n').join(delimiter);
-	} // withOut masking
+	if (document.getElementById('idJoinOneList').checked) {
+		var delimiter = document.getElementById('JoinDelimiter').value;
+		var doMasking = document.getElementById('JoinMasking').checked;
+		if (doMasking) { // with masking
+			document.getElementById(outArray[0]).value = prepend_append( 
+				document.getElementById(inArray[0]).value, 
+				document.getElementById('JoinMaskingChar').value, 
+				document.getElementById('JoinMaskingChar').value 
+			).split('\n').join(delimiter);
+		} else { // withOut masking
+			// check for occurences of delimiter
+			let amount_delimiters = document.getElementById(inArray[0]).value.split(delimiter).length - 1;
+			if (amount_delimiters > 0) {
+				if (! confirm('The input contains ' + amount_delimiters 
+					+ ' occurences of the delimiter.\nContinue anyway?')) {
+					return;
+				}
+			}
+			// join
+			document.getElementById(outArray[0]).value 
+				= document.getElementById(inArray[0]).value.split('\n').join(delimiter);
+		} // withOut masking
+	}
+	if (document.getElementById('idJoinText').checked) {
+		var text = document.getElementById('JoinText').value;
+		var textBefore = document.getElementById('idJoinTextPosBefore').checked;
+		var listArray = document.getElementById(inArray[0]).value.split('\n');
+		for (let i = 0; i < listArray.length; i++) {
+			if (textBefore) {
+				listArray[i] = text + listArray[i];
+			} else {
+				listArray[i] = listArray[i] + text;
+			}
+		}
+		document.getElementById(outArray[0]).value = listArray.join('\n');
+	}
 	countLines(outArray[0]);
 } // function join
 
@@ -937,7 +991,7 @@ function searchDuplicates(inArray, outArray) {
 	var len = ListAArray.length;
 	var UniqueList = [];
 	var DuplicatesList = [];
-	for (let i = 0; i < len; i++ ) { // loop through list
+	for (let i = 0; i < len; i++) { // loop through list
 		if(onlySingles) { // only singles
 			if(ListAArray.indexOf(ListAArray[i], i + 1) == -1 && DuplicatesList.indexOf(ListAArray[i]) == -1 ) { // not found -> single
 				UniqueList.push(ListAArray[i]);
@@ -978,7 +1032,7 @@ function setTheory(inArray, outArray) {
 	} // no option selected
 	if (document.getElementById('idSetTheoryInterDiff').checked) { // intersection and difference sets
 		// DifferenzmengeA and Schnittmenge
-		for (let i = 0; i < lenA; i++ ) { // loop through list A
+		for (let i = 0; i < lenA; i++) { // loop through list A
 			if(ListBArray.indexOf(ListAArray[i]) == -1) { // not found -> Differenzmenge
 				DifferenzmengeA.push(ListAArray[i]);
 			} else { // found -> Schnittmenge
@@ -986,7 +1040,7 @@ function setTheory(inArray, outArray) {
 			} // found -> Schnittmenge
 		} // loop through list A
 		// DifferenzmengeB
-		for ( i = 0; i < lenB; i++ ) { // loop through list B
+		for (let i = 0; i < lenB; i++) { // loop through list B
 			if(ListAArray.indexOf(ListBArray[i]) == -1) { // not found -> Differenzmenge
 				DifferenzmengeB.push(ListBArray[i]);
 			} // not found -> Differenzmenge
@@ -997,12 +1051,12 @@ function setTheory(inArray, outArray) {
 	} // intersection and difference sets
 
 	if (document.getElementById('idSetTheoryUnion').checked) { // union set
-		for ( i = 0; i < lenA; i++ ) { // loop through list A
+		for (let i = 0; i < lenA; i++) { // loop through list A
 			if(Vereinigungsmenge.indexOf(ListAArray[i]) == -1) { // not found -> first occurance
 				Vereinigungsmenge.push(ListAArray[i]);
 			} // not found -> first occurance
 		} // loop through list A
-		for ( i = 0; i < lenB; i++ ) { // loop through list B
+		for (let i = 0; i < lenB; i++) { // loop through list B
 			if(Vereinigungsmenge.indexOf(ListBArray[i]) == -1) { // not found -> first occurance
 				Vereinigungsmenge.push(ListBArray[i]);
 			} // not found -> first occurance
@@ -1011,12 +1065,12 @@ function setTheory(inArray, outArray) {
 	} // union set
 	
 	if (document.getElementById('idSetTheorySymmDiff').checked) { // symmetric difference set
-		for ( i = 0; i < lenA; i++ ) { // loop through list A
+		for (let i = 0; i < lenA; i++) { // loop through list A
 			if(ListBArray.indexOf(ListAArray[i]) == -1) { // not found -> Differenzmenge
 				SymDiffmenge.push(ListAArray[i]);
 			} // not found -> first occurance
 		} // loop through list A
-		for ( i = 0; i < lenB; i++ ) { // loop through list A
+		for (let i = 0; i < lenB; i++) { // loop through list A
 			if(ListAArray.indexOf(ListBArray[i]) == -1) { // not found -> Differenzmenge
 				SymDiffmenge.push(ListBArray[i]);
 			} // not found -> first occurance
