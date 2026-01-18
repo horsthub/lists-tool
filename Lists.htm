@@ -32,11 +32,11 @@
 <br />
 <!-- Action -->
 <div id="ActionArea" style="display: inline">
-  <input type="button" id="idButtonEdit" value="Edit ..." onclick="selectAreaButton('top', 'edit')"> &nbsp; 
-  <input type="button" id="idButtonSort" value="Sort ..." onclick="selectAreaButton('top', 'sort')"> &nbsp; 
-  <input type="button" id="idButtonDuplicates" value="Duplicates ..." onclick="selectAreaButton('top', 'duplicates')"> &nbsp; 
-  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('top', 'set theory')"> &nbsp; 
-  <input type="button" id="idButtonCompare" value="Compare ..." onclick="selectAreaButton('top', 'compare')"> &nbsp; 
+  <input type="button" id="idButtonEdit" value="Edit ..." onclick="selectAreaButton('top', 'edit')"> &nbsp;
+  <input type="button" id="idButtonSort" value="Sort ..." onclick="selectAreaButton('top', 'sort')"> &nbsp;
+  <input type="button" id="idButtonDuplicates" value="Duplicates ..." onclick="selectAreaButton('top', 'duplicates')"> &nbsp;
+  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('top', 'set theory')"> &nbsp;
+  <input type="button" id="idButtonCompare" value="Compare ..." onclick="selectAreaButton('top', 'compare')"> &nbsp;
   <a href="javascript:showHelp('overall')" class="boldNoUnderline">?</a>
   <br /><br />
 </div>
@@ -45,10 +45,11 @@
 <!-- Edit -->
 <span id="idEditArea" style="display: none">
   <!-- Sub-Action Buttons -->
-  <input type="button" id="idButtonTrim" value="Trim ..." onclick="selectAreaButton('sub', 'trim')"> &nbsp; 
-  <input type="button" id="idButtonCase" value="Case ..." onclick="selectAreaButton('sub', 'case')"> &nbsp; 
-  <input type="button" id="idButtonRepeat" value="Repeat ..." onclick="selectAreaButton('sub', 'repeat')"> &nbsp; 
-  <input type="button" id="idButtonSplit" value="Split ..." onclick="selectAreaButton('sub', 'split')"> &nbsp; 
+  <input type="button" id="idButtonTrim" value="Trim ..." onclick="selectAreaButton('sub', 'trim')"> &nbsp;
+  <input type="button" id="idButtonCase" value="Case ..." onclick="selectAreaButton('sub', 'case')"> &nbsp;
+  <input type="button" id="idButtonRepeat" value="Repeat ..." onclick="selectAreaButton('sub', 'repeat')"> &nbsp;
+  <input type="button" id="idButtonSeries" value="Series ..." onclick="selectAreaButton('sub', 'series')"> &nbsp;
+  <input type="button" id="idButtonSplit" value="Split ..." onclick="selectAreaButton('sub', 'split')"> &nbsp;
   <input type="button" id="idButtonJoin" value="Join ..." onclick="selectAreaButton('sub', 'join')"> <br /><br />
   <!-- Edit - Trim -->
   <span id="idTrimArea" style="display: none">
@@ -62,6 +63,17 @@
   <!-- Edit - Repeat -->
   <span id="idRepeatArea" style="display: none">
     <input type="number" id="RepeatTimes" value='10'> times <br />
+  </span>
+  <!-- Edit - Series -->
+  <span id="idSeriesArea" style="display: none">
+    <input type="number" id="SeriesStart" value="1" min="0"> -
+    <input type="number" id="SeriesEnd" value="10" min="0"> &nbsp; 
+    <label><input type="checkbox" id="SeriesLeadingZero" onchange="onchangeCheckedLeadingZeros()"> Leading zeros </label>
+    <xspan id="SeriesZeroSpan">
+      <input type="number" id="SeriesZeroAmount" value="0" min="0" class="hiddenFree">
+    </xspan> &nbsp;
+    <a href="javascript:showHelp('Series')" class="boldNoUnderline">?</a>
+    <br />
   </span>
   <!-- Edit - Split -->
   <span id="idSplitArea" style="display: none">

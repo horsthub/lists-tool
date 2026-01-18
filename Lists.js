@@ -10,6 +10,7 @@ const InOutAmounts = {
 	edit_trim: '1_1',
 	edit_case: '1_1',
 	edit_repeat: '1_1',
+	edit_series: '0_1',
 	edit_split: '1_1',
 	edit_join: '1_1',
 	sort: '1_1',
@@ -58,6 +59,15 @@ function showHelp(helpType) {
 			helpBody += '</ul>';
 			helpBody += 'Hotkeys:<br><br>';
 			helpBody += ' &nbsp; &nbsp; Esc: close all dialogs (list actions and help)<br><br><br>';
+			break;
+		case 'Series':
+			var helpHeader = '<b>Series</b>';
+			var helpBody = 'Ascending and descending<br>';
+			helpBody += '<span class="indentText">Ascending with first number smaller than second</span><br>';
+			helpBody += '<span class="indentText">Descending with first number larger than second</span><br><br>';							
+			helpBody += 'Leading zeros:<br>';
+			helpBody += '<span class="indentText">Length of the number with the leading zeros</span><br>';
+			helpBody += '<span class="indentText">0 = Fit length with biggest number</span><br><br>';
 			break;
 		case 'Duplicates':
 			var helpHeader = '<b>Duplicates</b>';
@@ -316,14 +326,14 @@ function getArea(level, area, type) {
 	// level: 'top', 'sub'
 	var areaArray = (level == 'top')
 		? ['edit', 'sort', 'duplicates', 'set theory', 'compare']
-		: ['trim', 'case', 'repeat', 'split', 'join'];
+		: ['trim', 'case', 'repeat', 'series', 'split', 'join'];
 	var descriptionArray = ['Edit', 'Sort', 'Duplicates', 'Set Theory', 'Compare'];
 	var buttonIdArray = (level == 'top')
 		? ['idButtonEdit', 'idButtonSort', 'idButtonDuplicates', 'idButtonSetTheory', 'idButtonCompare']
-		: ['idButtonTrim', 'idButtonCase', 'idButtonRepeat', 'idButtonSplit', 'idButtonJoin'];
+		: ['idButtonTrim', 'idButtonCase', 'idButtonRepeat', 'idButtonSeries', 'idButtonSplit', 'idButtonJoin'];
 	var areaIdArray = (level == 'top')
 		? ['idEditArea', 'idSortArea', 'idDuplicatesArea', 'idSetTheoryArea', 'idCompareArea']
-		: ['idTrimArea', 'idCaseArea', 'idRepeatArea', 'idSplitArea', 'idJoinArea'];
+		: ['idTrimArea', 'idCaseArea', 'idRepeatArea', 'idSeriesArea', 'idSplitArea', 'idJoinArea'];
 	var pos = areaArray.indexOf(area);
 	if (type == 'allAreaIds') {
 		return areaIdArray;
@@ -357,7 +367,7 @@ function calcBreadcrumbs(area) { // ### unused
 
 function selectAreaButton(level, area) {
 	// level: 'top', 'sub'
-	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare',   'trim', 'case', 'repeat', 'split', 'join'
+	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare',   'trim', 'case', 'repeat', 'series', 'split', 'join'
 	const className = {
 		top: 'pressedActionTopButton',
 		sub: 'pressedActionSubButton'
@@ -626,6 +636,9 @@ function goButton(area) {
 					case 'repeat':
 						repeat(InOutArray[0], InOutArray[1]);
 						break;
+					case 'series':
+						series(InOutArray[0], InOutArray[1]);
+						break;
 					case 'split':
 						split(InOutArray[0], InOutArray[1]);
 						break;
@@ -747,6 +760,53 @@ function repeat(inArray, outArray) {
 	countLines(outArray[0]);
 } // function repeat
 
+function onchangeCheckedLeadingZeros() {
+	if (document.getElementById('SeriesLeadingZero').checked) {
+		document.getElementById('SeriesZeroAmount').classList.remove('hiddenFree');
+	} else  {
+		document.getElementById('SeriesZeroAmount').classList.add('hiddenFree');
+	}
+}
+
+function addLeadingZeros(number, amount, end) {
+	if (amount == 0) {
+		amount = end.toString().length;
+	}
+	var amountZeros = amount - number.toString().length;
+	if (amountZeros < 0) {
+		amountZeros = 0;
+	}
+	return '0'.repeat(amountZeros) + number;
+}
+
+function series(inArray, outArray) {
+	// to do: hexadeximal
+	// to do: letter (upper and lower)
+	var start = document.getElementById('SeriesStart').value * 1;
+	var end = document.getElementById('SeriesEnd').value * 1;
+	var haveLeadingZeros = document.getElementById('SeriesLeadingZero').checked;
+	var amountLeadingZeros = document.getElementById('SeriesZeroAmount').value * 1;
+	var resultArray = [];
+	var ascending = (start < end) ? true : false;
+	var nextLoop = true;
+	while (nextLoop) {
+		let number = start;
+		if (haveLeadingZeros) {
+			number = addLeadingZeros(number, amountLeadingZeros, end);
+		}
+		resultArray.push(number);
+		if (ascending) {
+			start++;
+			nextLoop = (start <= end) ? true : false;
+		} else {
+			start--;
+			nextLoop = (start >= end) ? true : false;
+		}
+	}
+	document.getElementById(outArray[0]).value = resultArray.join('\n');
+	countLines(outArray[0]);
+} // function series
+
 function split(inArray, outArray) {
 	var delimiter = document.getElementById('SplitDelimiter').value;
 	var doMasking = document.getElementById('SplitMasking').checked;
@@ -836,8 +896,7 @@ function split(inArray, outArray) {
 function prepend_append(textWithLinebreaks, preText, postText) {
 	var textArray = textWithLinebreaks.split('\n');
 	var newtextWithLinebreaks = '';
-	var i;
-	for (i = 0; i < textArray.length; i++) {
+	for (let i = 0; i < textArray.length; i++) {
 		newtextWithLinebreaks += preText + textArray[i] + postText;
 		if (i+1 <  textArray.length) {
 			newtextWithLinebreaks += '\n';
@@ -878,8 +937,7 @@ function searchDuplicates(inArray, outArray) {
 	var len = ListAArray.length;
 	var UniqueList = [];
 	var DuplicatesList = [];
-	var i;
-	for ( i = 0; i < len; i++ ) { // loop through list
+	for (let i = 0; i < len; i++ ) { // loop through list
 		if(onlySingles) { // only singles
 			if(ListAArray.indexOf(ListAArray[i], i + 1) == -1 && DuplicatesList.indexOf(ListAArray[i]) == -1 ) { // not found -> single
 				UniqueList.push(ListAArray[i]);
@@ -913,7 +971,6 @@ function setTheory(inArray, outArray) {
 	var DifferenzmengeB = []; // relative complement of A in B
 	var Vereinigungsmenge = []; // union of A and B
 	var SymDiffmenge = []; // symmetric difference of A and B
-	var i;
 	if (document.getElementById('idSetTheoryInterDiff').checked == false 
 		&& document.getElementById('idSetTheoryUnion').checked == false
 		&& document.getElementById('idSetTheorySymmDiff').checked == false) { // no option selected
@@ -921,7 +978,7 @@ function setTheory(inArray, outArray) {
 	} // no option selected
 	if (document.getElementById('idSetTheoryInterDiff').checked) { // intersection and difference sets
 		// DifferenzmengeA and Schnittmenge
-		for ( i = 0; i < lenA; i++ ) { // loop through list A
+		for (let i = 0; i < lenA; i++ ) { // loop through list A
 			if(ListBArray.indexOf(ListAArray[i]) == -1) { // not found -> Differenzmenge
 				DifferenzmengeA.push(ListAArray[i]);
 			} else { // found -> Schnittmenge
