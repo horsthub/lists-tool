@@ -29,6 +29,14 @@ body{
 	font-weight: bold;
 }
 
+.hiddenFree {
+    display: none;
+}
+
+.hiddenThere {
+    visibility: hidden;
+}
+
 table.b1b{
 	border: 1px solid black;
 }

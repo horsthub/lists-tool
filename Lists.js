@@ -7,7 +7,11 @@ const cellAmountObj = {
 	OutputCol: 0 // amount of Output columns // 0=one row, 1=one col, 2=two col, ...
 };
 const InOutAmounts = {
-	edit: '1_1',
+	edit_trim: '1_1',
+	edit_case: '1_1',
+	edit_repeat: '1_1',
+	edit_split: '1_1',
+	edit_join: '1_1',
 	sort: '1_1',
 	duplicates: '1_2',
 	SetTheoryInterDiff: '2_3',
@@ -387,11 +391,10 @@ function selectAreaButton(level, area) {
 			updateListNameIcon(true);
 		}
 	} else {
-		if (activeSubButton == '') {
-			showInOutCheckboxes('edit');
-			updateListNameIcon(true);
-		}
 		activeSubButton = area;
+		showInOutCheckboxes('edit');
+		updateListNameIcon(true);
+
 	}
 	clearMessage();
 } // function selectAreaButton
@@ -410,11 +413,14 @@ function updateCheckboxesBothLines() {
 			&& activeSubButton == ''
 		)) {
 			var typeArray = ['Input', 'Output'];
-			var area = getArea('top', coll[0].id, 'area');
-			if (area == 'set theory') {
-				area = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+			var amountProperty = getArea('top', coll[0].id, 'area');
+			if (amountProperty == 'edit') {
+				amountProperty += '_' + activeSubButton;
 			}
-			var requiredAmounts = InOutAmounts[area].split('_');
+			if (amountProperty == 'set theory') {
+				amountProperty = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+			}
+			var requiredAmounts = InOutAmounts[amountProperty].split('_');
 			var short;
 			for (let i=0; i<=1; i++) { // loop through Input and Output
 				short = (document.getElementById('id' + typeArray[i] + 'OtherLabel').style.display == 'none') ? false : true;
@@ -442,7 +448,7 @@ function updateCheckboxesOneLine (type, requiredAmount, short) {
 }
 
 function updateListNameIcon(showIcons) {
-	// showIcons: true (calc and show icons), false (show text 'List', when there are no input output radio buttons)
+	// showIcons: true (calc and show icons), false (show always text 'List' instead of icon, when there are no input/output radio buttons)
 	var typeArray = ['Input', 'Output'];
 	for (let j = 0; j < typeArray.length; j++) { // loop through 'Input' and 'Output'
 		let type = typeArray[j];
@@ -519,20 +525,27 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	var ticked;
 	var parameter = "'" + typeInOut + "', " + requiredAmount;
 	var code = '';
+	var styleHidden = '';
+	if (requiredAmount == 0) {
+		code += '---';
+		styleHidden = ' style="visibility: hidden"';
+	}
 	for (let j=0; j<typeArray.length; j++) {
 		code += (j==1) ? ' &nbsp; &nbsp; &nbsp; ' : '';
 		for (let i=1; i<=cellAmountObj[typeArray[j]]; i++) {
 			id = 'id' + typeInOut + '-' + typeArray[j] + '-' + i;
 			ticked = (tickedIds.includes(typeArray[j]+'-'+i)) ? ' checked="checked"' : '';
-			code += '<label>';
+			code += '<label' + styleHidden + '>';
 			code += '  <input ' + typeCheckboxRadio + ' name="' + typeInOut + 'Boxes" id="' + id + '"';
 			code += '    onchange="onchangeInOutCheckboxes(' + parameter + ');"' + ticked + '> ';
 			code += getCellName(typeArray[j], i);
 			code += '</label> &nbsp; ';
 		}
 	}
-	var style = (short) ? '' : ' style="display: none"';
-	code += '<label id="id' + typeInOut + 'OtherLabel"' + style + '> &nbsp; &nbsp; &nbsp; ';
+	if (! short) {
+		styleHidden = ' style="display: none"';
+	}
+	code += '<label id="id' + typeInOut + 'OtherLabel"' + styleHidden + '> &nbsp; &nbsp; &nbsp; ';
 	code += '  <input type="checkbox" id="id' + typeInOut + 'Other"';
 	parameter +=  ", false";
 	code += '    onchange="updateCheckboxesOneLine(' + parameter + ');"> ';
@@ -551,13 +564,17 @@ function getProgressiveNumberString(type, end) {
 	return array.join('_');
 }
 
-function showInOutCheckboxes(area) {
-	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare'
+function showInOutCheckboxes(areaTop) {
+	// areaTop: 'edit', 'sort', 'duplicates', 'set theory', 'compare'
 	var typeArray = ['Input', 'Output'];
-	if (area == 'set theory') {
-		area = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+	var amountProperty = areaTop;
+	if (areaTop == 'edit') {
+		amountProperty += '_' + activeSubButton;
 	}
-	var requiredAmounts = InOutAmounts[area].split('_');
+	if (areaTop == 'set theory') {
+		amountProperty = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+	}
+	var requiredAmounts = InOutAmounts[amountProperty].split('_');
 	var tickedIdString;
 	var code;
 	code = '<table>';
@@ -572,7 +589,7 @@ function showInOutCheckboxes(area) {
 	}
 	code += '  <tr>';
 	code += '    <td colspan="2">';
-	code += '      <button id="idButtonGo" onclick="goButton(' + `'` + area + `'` + ')">Go</button>';
+	code += '      <button id="idButtonGo" onclick="goButton(' + `'` + areaTop + `'` + ')">Go</button>';
 	code += '    </td>';
 	code += '  </tr>';
 	code += '</table>';
@@ -623,9 +640,7 @@ function goButton(area) {
 			case 'duplicates':
 				searchDuplicates(InOutArray[0], InOutArray[1]);
 				break;
-			case 'SetTheoryInterDiff':
-			case 'SetTheoryUnion':
-			case 'SetTheorySymmDiff':
+			case 'set theory':
 				setTheory(InOutArray[0], InOutArray[1]);
 				break;
 			case 'compare':
