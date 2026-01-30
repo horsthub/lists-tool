@@ -69,9 +69,7 @@
     <input type="number" id="SeriesStart" value="1" min="0"> -
     <input type="number" id="SeriesEnd" value="10" min="0"> &nbsp; 
     <label><input type="checkbox" id="SeriesLeadingZero" onchange="onchangeCheckedLeadingZeros()"> Leading zeros </label>
-    <xspan id="SeriesZeroSpan">
-      <input type="number" id="SeriesZeroAmount" value="0" min="0" class="hiddenFree">
-    </xspan> &nbsp;
+    <input type="number" id="SeriesZeroAmount" value="0" min="0" class="hiddenFree">
     <a href="javascript:showHelp('Series')" class="boldNoUnderline">?</a>
     <br />
   </span>
@@ -83,14 +81,20 @@
   </span>
   <!-- Edit - Join -->
   <span id="idJoinArea" style="display: none">
-    <label><input type="radio" name="JoinOptions" id="idJoinOneList" onchange="onchangeJoinOptions()" checked="checked"> One list </label>
-    <!-- <label><input type="radio" name="JoinOptions" id="idJoinTwoLists" onchange="onchangeJoinOptions()"> two lists </label> -->
-    <label><input type="radio" name="JoinOptions" id="idJoinText" onchange="onchangeJoinOptions()"> Text </label> &nbsp;
+    <label><input type="radio" name="JoinOptions" id="idEditJoinOneList" onchange="onchangeJoinOptions()" checked="checked"> One List </label>
+    <label><input type="radio" name="JoinOptions" id="idEditJoinTwoLists" onchange="onchangeJoinOptions()"> Two Lists </label>
+    <label><input type="radio" name="JoinOptions" id="idEditJoinText" onchange="onchangeJoinOptions()"> Text </label> &nbsp;
     <a href="javascript:showHelp('Join')" class="boldNoUnderline">?</a><br />
     <span id="idJoinOneListArea">
       Delimiter <input type="text" id="JoinDelimiter" value="," class="littleCentered"><br />
       <label><input type="checkbox" id="JoinMasking"> mask with </label>
       <input type="text" id="JoinMaskingChar" value='"' class="littleCentered"><br />
+    </span>
+    <span id="idJoinTwoListsArea" class="hiddenFree">
+      <label><input type="radio" name="JoinTwoPos" id="idJoinTwoPosUsual" checked="checked"> usual position </label>
+      <label><input type="radio" name="JoinTwoPos" id="idJoinTwoPosFlip"> flip position </label> &nbsp;
+      <a href="javascript:showHelp('JoinTwoPos')" class="boldNoUnderline">?</a>
+      <br />
     </span>
     <span id="idJoinTextArea" class="hiddenFree">
       Text <input type="text" id="JoinText" value=""><br />

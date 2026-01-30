@@ -12,7 +12,9 @@ const InOutAmounts = {
 	edit_repeat: '1_1',
 	edit_series: '0_1',
 	edit_split: '1_1',
-	edit_join: '1_1',
+	EditJoinOneList: '1_1',
+	EditJoinTwoLists: '2_1',
+	EditJoinText: '1_1',
 	sort: '1_1',
 	duplicates: '1_2',
 	SetTheoryInterDiff: '2_3',
@@ -27,18 +29,28 @@ var activeSubButton = ''; // '', 'trim', 'case', 'repeat', 'series', 'split', 'j
 function init() {
 	tableEdit('Input', 'init');
 	tableEdit('Output', 'init');
+	onchangeCheckedLeadingZeros();
+	document.getElementById('idEditJoinOneList').checked = true;
 }
 
-function showHelp(helpType) {
+function showDialog(text) {
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 	var shadowHtml = '<a href="javascript:closeHelp()" class="HelpShadow" style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
 	var tableStart = '<table class="b1b"><tr><td> &nbsp; &nbsp; </td><td>'
 	var tableEnd = '</td><td> &nbsp; &nbsp; </td></tr></table>'
 	var closeButton = '<div style="text-align: right;"> <a href="javascript:closeHelp()" style="text-decoration: none"> &nbsp; &nbsp; x &nbsp; &nbsp; </a> </div>';
+	document.getElementById('HelpShadow').innerHTML = shadowHtml;
+	document.getElementById('HelpShadow').style.visibility = 'visible';
+	document.getElementById('HelpPopup').innerHTML = tableStart + closeButton + text + tableEnd;
+	document.getElementById('HelpPopup').style.visibility = 'visible';
+	helpStatusActive = true;
+} // function showDialog
+
+function showHelp(helpType) {
 	switch(helpType) {
 		case 'overall':
-			var helpHeader = '<b>Lists Tool</b>';
+			var helpHeader = 'Lists Tool';
 			var helpBody = 'List names:<br><br>';
 			helpBody += ' &nbsp; &nbsp; List A: the action does not use this list<br>';
 			helpBody += ' &nbsp; &nbsp; <img src="icon-input.svg" class="img-input-output" /> A: the action uses this list as input<br>';
@@ -61,7 +73,7 @@ function showHelp(helpType) {
 			helpBody += ' &nbsp; &nbsp; Esc: close all dialogs (list actions and help)<br><br><br>';
 			break;
 		case 'Series':
-			var helpHeader = '<b>Series</b>';
+			var helpHeader = 'Series';
 			var helpBody = 'Ascending and descending<br>';
 			helpBody += '<span class="indentText">Ascending with first number smaller than second</span><br>';
 			helpBody += '<span class="indentText">Descending with first number larger than second</span><br><br>';							
@@ -70,28 +82,73 @@ function showHelp(helpType) {
 			helpBody += '<span class="indentText">0 = Fit length with biggest number</span><br><br>';
 			break;
 		case 'Join':
-			var helpHeader = '<b>Join</b>';
+			var helpHeader = 'Join';
 			var helpBody = '<ul>';
-			helpBody += '  <li>One list<br>';
-			helpBody += '    The elements of one list will be joined to one text <br>';
+			helpBody += '  <li>One List<br>';
+			helpBody += '    The elements of one list will be joined to one text<br>';
 			helpBody += '    (separated with the delimiter).';
 			helpBody += '  </li><br>';
+			helpBody += '  <li>Two Lists<br>';
+			helpBody += '    The elements of two list will be joined as elements<br>';
+			helpBody += '    of one new list.';
+			helpBody += '  </li><br>';
 			helpBody += '  <li>Text<br>';
-			helpBody += '    A text will be prepended or appended <br>';
+			helpBody += '    A text will be prepended or appended<br>';
 			helpBody += '    to each element of one list.';
 			helpBody += '  </li>';
 			helpBody += '</ul><br><br>';
 			break;
+		case 'JoinTwoPos':
+			var helpHeader = 'Join - Two Lists - Position';
+			var helpBody = '<table>';
+			helpBody += '  <tr>';
+			helpBody += '    <td style="display: flex;">';
+			helpBody += '    <div style="margin-left: auto">';
+			helpBody += '    List A<div class="help-join-two-list">a-<br>a=<br>a~</div><br>';
+			helpBody += '    </div>';
+			helpBody += '    </td>';
+			helpBody += '    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>';
+			helpBody += '    <td>List B<div class="help-join-two-list">b.<br>b,<br>b;</div><br></td>';
+			helpBody += '  </tr>';
+			helpBody += '  <tr>';
+			helpBody += '    <td>';
+			helpBody += '      <input type="radio" checked="checked"> <b>usual</b> position<br>';
+			helpBody += '      Input <input type="checkbox" checked="checked"> A ';
+			helpBody += '      <input type="checkbox" checked="checked"> B<br><br>';
+			helpBody += '      The elements of the list<br>';
+			helpBody += '      with&nbsp;the&nbsp;<b>lower</b>&nbsp;list&nbsp;name&nbsp;letter<br>';
+			helpBody += '      will be on the <b>left</b>.<br>';
+			helpBody += '      And the elements of the list<br>';
+			helpBody += '      with&nbsp;the&nbsp;<b>higher</b>&nbsp;list&nbsp;name&nbsp;letter<br>';
+			helpBody += '      will be on the <b>right</b>:<br>';
+			helpBody += '      <div class="help-join-two-list">a-b.<br>a=b,<br>a~b;</div>';
+			helpBody += '    </td>';
+			helpBody += '    <td></td>';
+			helpBody += '    <td>';
+			helpBody += '      <input type="radio" checked="checked"> <b>flip</b> position<br>';
+			helpBody += '      Input <input type="checkbox" checked="checked"> A ';
+			helpBody += '      <input type="checkbox" checked="checked"> B<br><br>';
+			helpBody += '      The elements of the list<br>';
+			helpBody += '      with&nbsp;the&nbsp;<b>lower</b>&nbsp;list&nbsp;name&nbsp;letter<br>';
+			helpBody += '      will be on the <b>right</b>.<br>';
+			helpBody += '      And the elements of the list<br>';
+			helpBody += '      with&nbsp;the&nbsp;<b>higher</b>&nbsp;list&nbsp;name&nbsp;letter<br>';
+			helpBody += '      will be on the <b>left</b>:<br>';
+			helpBody += '      <div class="help-join-two-list">b.a-<br>b,a=<br>b;a~</div>';
+			helpBody += '    </td>';
+			helpBody += '  </tr>';
+			helpBody += '</table><br>';
+			break;			
 		case 'Duplicates':
-			var helpHeader = '<b>Duplicates</b>';
+			var helpHeader = 'Duplicates';
 			var helpBody = '<table class="cellSpacing">';
 			helpBody += '  <tr>';
 			helpBody += '    <td colspan="4" class="cellBorder"><center><b>aa</b><br>bb<br><b>aa</b><br>cc</center></td>';
 			helpBody += '  </tr>';
 			helpBody += '  <tr>';
 			// readonly does obviously not work with type=checkbox - but it works with type=text
-			helpBody += '    <td colspan="2" class="cellBorder"><center><input type="checkbox" value="onlySingles" readonly="true"> only singles</center></td>';
-			helpBody += '    <td colspan="2" class="cellBorder"><center><input type="checkbox" value="onlySingles" readonly="true" checked="checked"> only singles</center></td>';
+			helpBody += '    <td colspan="2" class="cellBorder"><center><input type="checkbox" readonly="true"> only singles</center></td>';
+			helpBody += '    <td colspan="2" class="cellBorder"><center><input type="checkbox" readonly="true" checked="checked"> only singles</center></td>';
 			helpBody += '  </tr>';
 			helpBody += '  <tr>';
 			helpBody += '    <td width="125" class="cellBorder"><center><b>aa</b><br>bb<br>cc<br><br></center>first occurance of the duplicate is in the list of the singles</td>';
@@ -102,7 +159,7 @@ function showHelp(helpType) {
 			helpBody += '</table><br>';
 			break;
 		case 'SetTheory':
-			var helpHeader = '<b>Set Theory</b>';
+			var helpHeader = 'Set Theory';
 			var helpBody = 'intersection and difference sets<br>';
 			helpBody += ' &nbsp; &nbsp; <img src="SetTheory_IntersectionLeft.svg" />';
 			helpBody += ' &nbsp; <img src="SetTheory_DifferenceSet.svg" />';
@@ -113,7 +170,7 @@ function showHelp(helpType) {
 			helpBody += ' &nbsp; &nbsp; <img src="SetTheory_SymetricDifferenceSet.svg" />';
 			break;
 		case 'Compare':
-			var helpHeader = '<b>Compare</b>';
+			var helpHeader = 'Compare';
 			var helpBody = 'VSCodium / VS Code and other tools<br>';
 			helpBody += 'have indisputable better compare features.<br>';
 			helpBody += 'But they need to have the texts stored in files.<br><br>';
@@ -135,10 +192,7 @@ function showHelp(helpType) {
 			var helpBody = '¤¤¤ ¤¤¤';
 			break;
 	}
-	document.getElementById('HelpShadow').innerHTML = shadowHtml;
-	document.getElementById('HelpShadow').style.visibility = 'visible';
-	document.getElementById('HelpPopup').innerHTML = tableStart + closeButton + helpHeader + '<br><br>' + helpBody + tableEnd;
-	document.getElementById('HelpPopup').style.visibility = 'visible';
+	showDialog('<b>' + helpHeader + '</b><br><br>' + helpBody);
 	helpStatusActive = true;
 }  // function showHelp
 
@@ -423,11 +477,15 @@ function selectAreaButton(level, area) {
 
 function onchangeJoinOptions() {
 	document.getElementById('idJoinOneListArea').classList.add('hiddenFree');
+	document.getElementById('idJoinTwoListsArea').classList.add('hiddenFree');
 	document.getElementById('idJoinTextArea').classList.add('hiddenFree');
-	if (document.getElementById('idJoinOneList').checked) {
+	if (document.getElementById('idEditJoinOneList').checked) {
 		document.getElementById('idJoinOneListArea').classList.remove('hiddenFree');
 	}
-	if (document.getElementById('idJoinText').checked) {
+	if (document.getElementById('idEditJoinTwoLists').checked) {
+		document.getElementById('idJoinTwoListsArea').classList.remove('hiddenFree');
+	}
+	if (document.getElementById('idEditJoinText').checked) {
 		document.getElementById('idJoinTextArea').classList.remove('hiddenFree');
 	}
 	showInOutCheckboxes('edit');
@@ -451,6 +509,9 @@ function updateCheckboxesBothLines() {
 			var amountProperty = getArea('top', coll[0].id, 'area');
 			if (amountProperty == 'edit') {
 				amountProperty += '_' + activeSubButton;
+			}
+			if (amountProperty == 'edit_join') {
+				amountProperty = document.querySelectorAll('input[name="JoinOptions"]:checked')[0].id.substring(2);
 			}
 			if (amountProperty == 'set theory') {
 				amountProperty = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
@@ -606,6 +667,9 @@ function showInOutCheckboxes(areaTop) {
 	if (areaTop == 'edit') {
 		amountProperty += '_' + activeSubButton;
 	}
+	if (amountProperty == 'edit_join') {
+		amountProperty = document.querySelectorAll('input[name="JoinOptions"]:checked')[0].id.substring(2);
+	}
 	if (areaTop == 'set theory') {
 		amountProperty = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
 	}
@@ -637,6 +701,7 @@ function goButton(area) {
 		var typeArray = ['Input', 'Output'];
 		var nodeList;
 		var idPartsArray = [];
+		// fill InOutArray with checked Input / Output radios
 		for (let i = 0; i < typeArray.length; i++) {
 			InOutArray[i] = [];
 			nodeList = document.querySelectorAll('input[name="' + typeArray[i] + 'Boxes"]:checked')
@@ -696,6 +761,7 @@ function countLines(fieldId) {
 		counter = document.getElementById(fieldId).value.split('\n').length;
 	}
 	document.getElementById('Counter' + fieldId).innerHTML = counter + ' lines';
+	return counter;
 } // function countLines
 
 function countLinesX(which) {
@@ -930,8 +996,55 @@ function prepend_append(textWithLinebreaks, preText, postText) {
 	return newtextWithLinebreaks;
 } // function prepend_append
 
+function joinTwoLists(inArrayString, outString, leftIsLonger, usingfirsts) {
+	// inArrayString: string with comma deimeted input list names: List*,List*
+	// outString: output list name: List*
+	// leftIsLonger: true = left list is longer, false right list is longer
+	// usingfirsts: true = take first elements of longer list, false = take last elements of longer list
+	closeHelp();	
+	var inArray = inArrayString.split(',');
+	var listArray1 = document.getElementById(inArray[0]).value.split('\n');
+	var listArray2 = document.getElementById(inArray[1]).value.split('\n');
+	var lenLongerList = (leftIsLonger) ? listArray1.length : listArray2.length;
+	var lenShorterList = (leftIsLonger) ? listArray2.length : listArray1.length;
+	var lenDiff = lenLongerList - lenShorterList;
+	var listArrayNew = [];
+	for (let i = 0; i < lenLongerList; i++) {
+		// calc left element
+		let leftElement = '';
+		if (leftIsLonger) {
+			leftElement = listArray1[i];
+		} else if (usingfirsts) {
+			if (i < lenShorterList) {
+				leftElement = listArray1[i];
+			}
+		} else {
+			if (i >= (lenDiff) ) {
+				leftElement = listArray1[i - lenDiff];
+			}
+		}
+		// calc right element
+		let rightElement = '';
+		if (! leftIsLonger) {
+			rightElement = listArray2[i];
+		} else if (usingfirsts) {
+			if (i < lenShorterList) {
+				rightElement = listArray2[i];
+			}
+		} else {
+			if (i >= (lenDiff) ) {
+				rightElement = listArray2[i - lenDiff];
+			}
+		}
+		// join both elements
+		listArrayNew[i] = leftElement + rightElement;
+	}
+	document.getElementById(outString).value = listArrayNew.join('\n');
+} // function joinTwoLists
+
 function join(inArray, outArray) {
-	if (document.getElementById('idJoinOneList').checked) {
+	// One List
+	if (document.getElementById('idEditJoinOneList').checked) {
 		var delimiter = document.getElementById('JoinDelimiter').value;
 		var doMasking = document.getElementById('JoinMasking').checked;
 		if (doMasking) { // with masking
@@ -954,7 +1067,54 @@ function join(inArray, outArray) {
 				= document.getElementById(inArray[0]).value.split('\n').join(delimiter);
 		} // withOut masking
 	}
-	if (document.getElementById('idJoinText').checked) {
+	// Two Lists
+	if (document.getElementById('idEditJoinTwoLists').checked) {
+		if (document.getElementById('idJoinTwoPosFlip').checked) {
+			inArray.reverse();
+		}
+		var lenInputLeft = countLines(inArray[0]);
+		var lenInputRight = countLines(inArray[1]);
+		if (lenInputLeft == lenInputRight) {
+			joinTwoLists(inArray.join(','), outArray[0], true, true);
+		} else {
+			var leftIsLonger = (lenInputLeft > lenInputRight) ? true : false;
+			var idLonger = (leftIsLonger) ? inArray[0].slice(-1) : inArray[1].slice(-1);
+			var idShorter = (leftIsLonger) ? inArray[1].slice(-1) : inArray[0].slice(-1);
+			var parameters_base = '`' + inArray.join(',') + '`, ';
+			parameters_base += '`' + outArray[0] + '`, ' + leftIsLonger + ', ';
+			var parameters;
+			var img;
+			var code = '';
+			code += 'List ' + idLonger + ' is longer than list ' + idShorter + '.<br>';
+			code += '<ul>';
+			code += '<li>';
+			code += 'Do you want to join the first elements of list ' + idLonger + '<br>';
+			code += 'with the elements of list ' + idShorter + '?<br>';
+			parameters = parameters_base + 'true';
+			code += '<button onclick="joinTwoLists(' + parameters + ')" class="indentButton">';
+			img = (leftIsLonger) ? 'assets/edit_join_two_left-longer-firsts.svg'
+				: 'assets/edit_join_two_right-longer-firsts.svg';
+			code += '<img src="' + img + '">';
+			code += '</button><br>';
+			code += '</li>';
+			code += '<br>';
+			code += '<li>';
+			code += 'Do you want to join the last elements of list ' + idLonger + '<br>';
+			code += 'with the elements of list ' + idShorter + '?<br>';
+			parameters = parameters_base + 'false';
+			code += '<button onclick="joinTwoLists(' + parameters + ')" class="indentButton">';
+			img = (leftIsLonger) ? 'assets/edit_join_two_left-longer-lasts.svg'
+				: 'assets/edit_join_two_right-longer-lasts.svg';
+			code += '<img src="' + img + '">';
+			code += '</button><br>';
+			code += '</li>';
+			code += '</ul>';
+			code += '<br>';
+			showDialog(code); 
+		}
+	}
+	// Text
+	if (document.getElementById('idEditJoinText').checked) {
 		var text = document.getElementById('JoinText').value;
 		var textBefore = document.getElementById('idJoinTextPosBefore').checked;
 		var listArray = document.getElementById(inArray[0]).value.split('\n');

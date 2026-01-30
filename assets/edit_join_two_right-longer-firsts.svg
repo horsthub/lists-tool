@@ -1,0 +1,37 @@
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+<!-- line height: 14, space between lines: 4 -->
+<defs>
+  <pattern id="pattern1" patternUnits="userSpaceOnUse" width="4" height="4">
+    <path d="M0,0 h4 v4 h-4 v-4 z   M0.5,0.5 v1 h1 v-1 h-1 z   M2.5,2.5 v1 h1 v-1 h-1 z" fill="gray" stroke="none" />
+  </pattern>
+  <marker id="markerArrowRight" markerWidth="10" markerHeight="10" refX="2" refY="6">
+    <path d="M2,2 v8 l8,-4z " fill="black" />
+  </marker>
+  <marker id="markerArrowLeft" markerWidth="10" markerHeight="10" refX="10" refY="6" >
+    <path d="M10,2 v8 l-8,-4z " fill="black" />
+  </marker>
+</defs>
+
+<rect x="7" y=" 6" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+<rect x="7" y="24" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+<rect x="7" y="42" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+
+<rect x="123" y=" 6" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+<rect x="123" y="24" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+<rect x="123" y="42" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+<rect x="123" y="60" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+<rect x="123" y="78" width="70" height="14" fill="url(#pattern1)" stroke="none" />
+
+<line x1=" 80" y1="14" x2=" 90" y2="14" stroke="black" stroke-width="1" marker-end="url(#markerArrowRight)" />
+<line x1="110" y1="14" x2="120" y2="14" stroke="black" stroke-width="1" marker-start="url(#markerArrowLeft)" />
+<line x1=" 80" y1="32" x2=" 90" y2="32" stroke="black" stroke-width="1" marker-end="url(#markerArrowRight)" />
+<line x1="110" y1="32" x2="120" y2="32" stroke="black" stroke-width="1" marker-start="url(#markerArrowLeft)" />
+<line x1=" 80" y1="50" x2=" 90" y2="50" stroke="black" stroke-width="1" marker-end="url(#markerArrowRight)" />
+<line x1="110" y1="50" x2="120" y2="50" stroke="black" stroke-width="1" marker-start="url(#markerArrowLeft)" />
+<line x1="110" y1="68" x2="120" y2="68" stroke="black" stroke-width="1" marker-start="url(#markerArrowLeft)" />
+<line x1="110" y1="86" x2="120" y2="86" stroke="black" stroke-width="1" marker-start="url(#markerArrowLeft)" />
+
+<_rect x="0" y="0" width="200" height="100" rx="10" ry="10" stroke="red" stroke-width="1" fill="none" />
+
+Sorry, your browser does not support inline SVG.
+</svg>
