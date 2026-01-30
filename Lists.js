@@ -996,6 +996,30 @@ function prepend_append(textWithLinebreaks, preText, postText) {
 	return newtextWithLinebreaks;
 } // function prepend_append
 
+function joinOneList(inArray, outArray) {
+	var delimiter = document.getElementById('JoinDelimiter').value;
+	var doMasking = document.getElementById('JoinMasking').checked;
+	if (doMasking) { // with masking
+		document.getElementById(outArray[0]).value = prepend_append( 
+			document.getElementById(inArray[0]).value, 
+			document.getElementById('JoinMaskingChar').value, 
+			document.getElementById('JoinMaskingChar').value 
+		).split('\n').join(delimiter);
+	} else { // withOut masking
+		// check for occurences of delimiter
+		let amount_delimiters = document.getElementById(inArray[0]).value.split(delimiter).length - 1;
+		if (amount_delimiters > 0) {
+			if (! confirm('The input contains ' + amount_delimiters 
+				+ ' occurences of the delimiter.\nContinue anyway?')) {
+				return;
+			}
+		}
+		// join
+		document.getElementById(outArray[0]).value 
+			= document.getElementById(inArray[0]).value.split('\n').join(delimiter);
+	} // withOut masking
+}
+
 function joinTwoLists(inArrayString, outString, leftIsLonger, usingfirsts) {
 	// inArrayString: string with comma deimeted input list names: List*,List*
 	// outString: output list name: List*
@@ -1042,90 +1066,78 @@ function joinTwoLists(inArrayString, outString, leftIsLonger, usingfirsts) {
 	document.getElementById(outString).value = listArrayNew.join('\n');
 } // function joinTwoLists
 
+function joinTwoListsPreCheck(inArray, outArray) {
+	if (document.getElementById('idJoinTwoPosFlip').checked) {
+		inArray.reverse();
+	}
+	var lenInputLeft = countLines(inArray[0]);
+	var lenInputRight = countLines(inArray[1]);
+	if (lenInputLeft == lenInputRight) {
+		joinTwoLists(inArray.join(','), outArray[0], true, true);
+	} else {
+		var leftIsLonger = (lenInputLeft > lenInputRight) ? true : false;
+		var idLonger = (leftIsLonger) ? inArray[0].slice(-1) : inArray[1].slice(-1);
+		var idShorter = (leftIsLonger) ? inArray[1].slice(-1) : inArray[0].slice(-1);
+		var parameters_base = '`' + inArray.join(',') + '`, ';
+		parameters_base += '`' + outArray[0] + '`, ' + leftIsLonger + ', ';
+		var parameters;
+		var img;
+		var code = '';
+		code += 'List ' + idLonger + ' is longer than list ' + idShorter + '.<br>';
+		code += '<ul>';
+		code += '<li>';
+		code += 'Do you want to join the first elements of list ' + idLonger + '<br>';
+		code += 'with the elements of list ' + idShorter + '?<br>';
+		parameters = parameters_base + 'true';
+		code += '<button onclick="joinTwoLists(' + parameters + ')" class="indentButton">';
+		img = (leftIsLonger) ? 'assets/edit_join_two_left-longer-firsts.svg'
+			: 'assets/edit_join_two_right-longer-firsts.svg';
+		code += '<img src="' + img + '">';
+		code += '</button><br>';
+		code += '</li>';
+		code += '<br>';
+		code += '<li>';
+		code += 'Do you want to join the last elements of list ' + idLonger + '<br>';
+		code += 'with the elements of list ' + idShorter + '?<br>';
+		parameters = parameters_base + 'false';
+		code += '<button onclick="joinTwoLists(' + parameters + ')" class="indentButton">';
+		img = (leftIsLonger) ? 'assets/edit_join_two_left-longer-lasts.svg'
+			: 'assets/edit_join_two_right-longer-lasts.svg';
+		code += '<img src="' + img + '">';
+		code += '</button><br>';
+		code += '</li>';
+		code += '</ul>';
+		code += '<br>';
+		showDialog(code); 
+	}
+}
+
+function joinText(inArray, outArray) {
+	var text = document.getElementById('JoinText').value;
+	var textBefore = document.getElementById('idJoinTextPosBefore').checked;
+	var listArray = document.getElementById(inArray[0]).value.split('\n');
+	for (let i = 0; i < listArray.length; i++) {
+		if (textBefore) {
+			listArray[i] = text + listArray[i];
+		} else {
+			listArray[i] = listArray[i] + text;
+		}
+	}
+	document.getElementById(outArray[0]).value = listArray.join('\n');
+}
+
 function join(inArray, outArray) {
 	// One List
 	if (document.getElementById('idEditJoinOneList').checked) {
-		var delimiter = document.getElementById('JoinDelimiter').value;
-		var doMasking = document.getElementById('JoinMasking').checked;
-		if (doMasking) { // with masking
-			document.getElementById(outArray[0]).value = prepend_append( 
-				document.getElementById(inArray[0]).value, 
-				document.getElementById('JoinMaskingChar').value, 
-				document.getElementById('JoinMaskingChar').value 
-			).split('\n').join(delimiter);
-		} else { // withOut masking
-			// check for occurences of delimiter
-			let amount_delimiters = document.getElementById(inArray[0]).value.split(delimiter).length - 1;
-			if (amount_delimiters > 0) {
-				if (! confirm('The input contains ' + amount_delimiters 
-					+ ' occurences of the delimiter.\nContinue anyway?')) {
-					return;
-				}
-			}
-			// join
-			document.getElementById(outArray[0]).value 
-				= document.getElementById(inArray[0]).value.split('\n').join(delimiter);
-		} // withOut masking
+		joinOneList(inArray, outArray);
 	}
 	// Two Lists
 	if (document.getElementById('idEditJoinTwoLists').checked) {
-		if (document.getElementById('idJoinTwoPosFlip').checked) {
-			inArray.reverse();
-		}
-		var lenInputLeft = countLines(inArray[0]);
-		var lenInputRight = countLines(inArray[1]);
-		if (lenInputLeft == lenInputRight) {
-			joinTwoLists(inArray.join(','), outArray[0], true, true);
-		} else {
-			var leftIsLonger = (lenInputLeft > lenInputRight) ? true : false;
-			var idLonger = (leftIsLonger) ? inArray[0].slice(-1) : inArray[1].slice(-1);
-			var idShorter = (leftIsLonger) ? inArray[1].slice(-1) : inArray[0].slice(-1);
-			var parameters_base = '`' + inArray.join(',') + '`, ';
-			parameters_base += '`' + outArray[0] + '`, ' + leftIsLonger + ', ';
-			var parameters;
-			var img;
-			var code = '';
-			code += 'List ' + idLonger + ' is longer than list ' + idShorter + '.<br>';
-			code += '<ul>';
-			code += '<li>';
-			code += 'Do you want to join the first elements of list ' + idLonger + '<br>';
-			code += 'with the elements of list ' + idShorter + '?<br>';
-			parameters = parameters_base + 'true';
-			code += '<button onclick="joinTwoLists(' + parameters + ')" class="indentButton">';
-			img = (leftIsLonger) ? 'assets/edit_join_two_left-longer-firsts.svg'
-				: 'assets/edit_join_two_right-longer-firsts.svg';
-			code += '<img src="' + img + '">';
-			code += '</button><br>';
-			code += '</li>';
-			code += '<br>';
-			code += '<li>';
-			code += 'Do you want to join the last elements of list ' + idLonger + '<br>';
-			code += 'with the elements of list ' + idShorter + '?<br>';
-			parameters = parameters_base + 'false';
-			code += '<button onclick="joinTwoLists(' + parameters + ')" class="indentButton">';
-			img = (leftIsLonger) ? 'assets/edit_join_two_left-longer-lasts.svg'
-				: 'assets/edit_join_two_right-longer-lasts.svg';
-			code += '<img src="' + img + '">';
-			code += '</button><br>';
-			code += '</li>';
-			code += '</ul>';
-			code += '<br>';
-			showDialog(code); 
-		}
+		joinTwoListsPreCheck(inArray, outArray);
 	}
 	// Text
 	if (document.getElementById('idEditJoinText').checked) {
-		var text = document.getElementById('JoinText').value;
-		var textBefore = document.getElementById('idJoinTextPosBefore').checked;
-		var listArray = document.getElementById(inArray[0]).value.split('\n');
-		for (let i = 0; i < listArray.length; i++) {
-			if (textBefore) {
-				listArray[i] = text + listArray[i];
-			} else {
-				listArray[i] = listArray[i] + text;
-			}
-		}
-		document.getElementById(outArray[0]).value = listArray.join('\n');
+		joinText(inArray, outArray);
 	}
 	countLines(outArray[0]);
 } // function join
