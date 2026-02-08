@@ -53,9 +53,9 @@ function showHelp(helpType) {
 			var helpHeader = 'Lists Tool';
 			var helpBody = 'List names:<br><br>';
 			helpBody += ' &nbsp; &nbsp; List A: the action does not use this list<br>';
-			helpBody += ' &nbsp; &nbsp; <img src="icon-input.svg" class="img-input-output" /> A: the action uses this list as input<br>';
-			helpBody += ' &nbsp; &nbsp; <img src="icon-output.svg" class="img-input-output" /> A: the action outputs to this list<br>';
-			helpBody += ' &nbsp; &nbsp; <img src="icon-input-output.svg" class="img-input-output" /> A: the action uses this list as input and outputs to this list<br>';
+			helpBody += ' &nbsp; &nbsp; <img src="assets/icon-input.svg" class="img-input-output" /> A: the action uses this list as input<br>';
+			helpBody += ' &nbsp; &nbsp; <img src="assets/icon-output.svg" class="img-input-output" /> A: the action outputs to this list<br>';
+			helpBody += ' &nbsp; &nbsp; <img src="assets/icon-input-output.svg" class="img-input-output" /> A: the action uses this list as input and outputs to this list<br>';
 			helpBody += '<br>';
 			helpBody += 'The line counters are updated:<br>';
 			helpBody += '<ul>';
@@ -161,13 +161,13 @@ function showHelp(helpType) {
 		case 'SetTheory':
 			var helpHeader = 'Set Theory';
 			var helpBody = 'intersection and difference sets<br>';
-			helpBody += ' &nbsp; &nbsp; <img src="SetTheory_IntersectionLeft.svg" />';
-			helpBody += ' &nbsp; <img src="SetTheory_DifferenceSet.svg" />';
-			helpBody += ' &nbsp; <img src="SetTheory_IntersectionRight.svg" /><br>';
+			helpBody += ' &nbsp; &nbsp; <img src="assets/SetTheory_IntersectionLeft.svg" />';
+			helpBody += ' &nbsp; <img src="assets/SetTheory_DifferenceSet.svg" />';
+			helpBody += ' &nbsp; <img src="assets/SetTheory_IntersectionRight.svg" /><br>';
 			helpBody += 'union set<br>';
-			helpBody += ' &nbsp; &nbsp; <img src="SetTheory_UnionSet.svg" /><br>';
+			helpBody += ' &nbsp; &nbsp; <img src="assets/SetTheory_UnionSet.svg" /><br>';
 			helpBody += 'symmetric difference set<br>';
-			helpBody += ' &nbsp; &nbsp; <img src="SetTheory_SymetricDifferenceSet.svg" />';
+			helpBody += ' &nbsp; &nbsp; <img src="assets/SetTheory_SymetricDifferenceSet.svg" />';
 			break;
 		case 'Compare':
 			var helpHeader = 'Compare';
@@ -575,7 +575,7 @@ function updateListNameIcon(showIcons) {
 				iconName += '.svg';
 				code = (iconName == 'icon.svg')
 					? 'List'
-					: '<img src="' + iconName + '" class="img-input-output">';
+					: '<img src="assets/' + iconName + '" class="img-input-output">';
 			} else {
 				code = 'List';
 			}
