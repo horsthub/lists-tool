@@ -497,6 +497,20 @@ function onchangeSetTheoryOptions() {
 	updateListNameIcon(true);
 }
 
+function getInOutAmountsObjPropertyName(areaTop) {
+	var propertyName = areaTop;
+	if (areaTop == 'edit') {
+		propertyName += '_' + activeSubButton;
+	}
+	if (propertyName == 'edit_join') {
+		propertyName = document.querySelectorAll('input[name="JoinOptions"]:checked')[0].id.substring(2);
+	}
+	if (areaTop == 'set theory') {
+		propertyName = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+	}
+	return propertyName;
+}
+
 function updateCheckboxesBothLines() {
 	var coll = document.getElementsByClassName('pressedActionTopButton');
 	if (coll.length == 0) {
@@ -506,17 +520,9 @@ function updateCheckboxesBothLines() {
 			&& activeSubButton == ''
 		)) {
 			var typeArray = ['Input', 'Output'];
-			var amountProperty = getArea('top', coll[0].id, 'area');
-			if (amountProperty == 'edit') {
-				amountProperty += '_' + activeSubButton;
-			}
-			if (amountProperty == 'edit_join') {
-				amountProperty = document.querySelectorAll('input[name="JoinOptions"]:checked')[0].id.substring(2);
-			}
-			if (amountProperty == 'set theory') {
-				amountProperty = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
-			}
-			var requiredAmounts = InOutAmounts[amountProperty].split('_');
+			var areaTop = getArea('top', coll[0].id, 'area');
+			var ioaPropertyName = getInOutAmountsObjPropertyName(areaTop);
+			var requiredAmounts = InOutAmounts[ioaPropertyName].split('_');
 			var short;
 			for (let i=0; i<=1; i++) { // loop through Input and Output
 				short = (document.getElementById('id' + typeArray[i] + 'OtherLabel').style.display == 'none') ? false : true;
@@ -663,17 +669,8 @@ function getProgressiveNumberString(type, end) {
 function showInOutCheckboxes(areaTop) {
 	// areaTop: 'edit', 'sort', 'duplicates', 'set theory', 'compare'
 	var typeArray = ['Input', 'Output'];
-	var amountProperty = areaTop;
-	if (areaTop == 'edit') {
-		amountProperty += '_' + activeSubButton;
-	}
-	if (amountProperty == 'edit_join') {
-		amountProperty = document.querySelectorAll('input[name="JoinOptions"]:checked')[0].id.substring(2);
-	}
-	if (areaTop == 'set theory') {
-		amountProperty = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
-	}
-	var requiredAmounts = InOutAmounts[amountProperty].split('_');
+	var ioaPropertyName = getInOutAmountsObjPropertyName(areaTop);
+	var requiredAmounts = InOutAmounts[ioaPropertyName].split('_');
 	var tickedIdString;
 	var code;
 	code = '<table>';
