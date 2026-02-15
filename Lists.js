@@ -20,7 +20,8 @@ const InOutAmounts = {
 	SetTheoryInterDiff: '2_3',
 	SetTheoryUnion: '2_1',
 	SetTheorySymmDiff: '2_1',
-	compare: '2_2'
+	compare: '2_0',
+	compareDetails: '2_2'
 };
 var helpStatusActive = false;  // needed to close with ESC
 var listMenuStatus = ''; // '', 'Input', 'Output' // needed to close with ESC
@@ -497,6 +498,11 @@ function onchangeSetTheoryOptions() {
 	updateListNameIcon(true);
 }
 
+function onchangeCompareDetails() {
+	showInOutCheckboxes('compare');
+	updateListNameIcon(true);
+}
+
 function getInOutAmountsObjPropertyName(areaTop) {
 	var propertyName = areaTop;
 	if (areaTop == 'edit') {
@@ -507,6 +513,9 @@ function getInOutAmountsObjPropertyName(areaTop) {
 	}
 	if (areaTop == 'setTheory') {
 		propertyName = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
+	}
+	if (areaTop == 'compare' && document.getElementById('compareDetails').checked) {
+		propertyName += 'Details';
 	}
 	return propertyName;
 }
