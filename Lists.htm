@@ -35,7 +35,7 @@
   <input type="button" id="idButtonEdit" value="Edit ..." onclick="selectAreaButton('top', 'edit')"> &nbsp;
   <input type="button" id="idButtonSort" value="Sort ..." onclick="selectAreaButton('top', 'sort')"> &nbsp;
   <input type="button" id="idButtonDuplicates" value="Duplicates ..." onclick="selectAreaButton('top', 'duplicates')"> &nbsp;
-  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('top', 'set theory')"> &nbsp;
+  <input type="button" id="idButtonSetTheory" value="Set Theory ..." onclick="selectAreaButton('top', 'setTheory')"> &nbsp;
   <input type="button" id="idButtonCompare" value="Compare ..." onclick="selectAreaButton('top', 'compare')"> &nbsp;
   <a href="javascript:showHelp('overall')" class="boldNoUnderline">?</a>
   <br /><br />
@@ -46,7 +46,7 @@
 <span id="idEditArea" style="display: none">
   <!-- Sub-Action Buttons -->
   <input type="button" id="idButtonTrim" value="Trim ..." onclick="selectAreaButton('sub', 'trim')"> &nbsp;
-  <input type="button" id="idButtonCase" value="Case ..." onclick="selectAreaButton('sub', 'case')"> &nbsp;
+  <input type="button" id="idButtonCases" value="Cases ..." onclick="selectAreaButton('sub', 'cases')"> &nbsp;
   <input type="button" id="idButtonRepeat" value="Repeat ..." onclick="selectAreaButton('sub', 'repeat')"> &nbsp;
   <input type="button" id="idButtonSeries" value="Series ..." onclick="selectAreaButton('sub', 'series')"> &nbsp;
   <input type="button" id="idButtonSplit" value="Split ..." onclick="selectAreaButton('sub', 'split')"> &nbsp;
@@ -54,11 +54,11 @@
   <!-- Edit - Trim -->
   <span id="idTrimArea" style="display: none">
   </span>
-  <!-- Edit - Case -->
-  <span id="idCaseArea" style="display: none">
-    <label><input type="radio" name="caseType" id="idCaseLower" checked="checked"> lowercase</label>
-    <label><input type="radio" name="caseType" id="idCaseUpper"> uppercase</label>
-    <label><input type="radio" name="caseType" id="idCaseProper"> propercase</label><br />
+  <!-- Edit - Cases -->
+  <span id="idCasesArea" style="display: none">
+    <label><input type="radio" name="casesType" id="idCasesLower" checked="checked"> lowercase</label>
+    <label><input type="radio" name="casesType" id="idCasesUpper"> uppercase</label>
+    <label><input type="radio" name="casesType" id="idCasesProper"> propercase</label><br />
   </span>
   <!-- Edit - Repeat -->
   <span id="idRepeatArea" style="display: none">

@@ -8,7 +8,7 @@ const cellAmountObj = {
 };
 const InOutAmounts = {
 	edit_trim: '1_1',
-	edit_case: '1_1',
+	edit_cases: '1_1',
 	edit_repeat: '1_1',
 	edit_series: '0_1',
 	edit_split: '1_1',
@@ -24,7 +24,7 @@ const InOutAmounts = {
 };
 var helpStatusActive = false;  // needed to close with ESC
 var listMenuStatus = ''; // '', 'Input', 'Output' // needed to close with ESC
-var activeSubButton = ''; // '', 'trim', 'case', 'repeat', 'series', 'split', 'join'
+var activeSubButton = ''; // '', 'trim', 'cases', 'repeat', 'series', 'split', 'join'
 
 function init() {
 	tableEdit('Input', 'init');
@@ -392,15 +392,15 @@ function tableEdit(table, operation) {
 function getArea(level, area, type) {
 	// level: 'top', 'sub'
 	var areaArray = (level == 'top')
-		? ['edit', 'sort', 'duplicates', 'set theory', 'compare']
-		: ['trim', 'case', 'repeat', 'series', 'split', 'join'];
+		? ['edit', 'sort', 'duplicates', 'setTheory', 'compare']
+		: ['trim', 'cases', 'repeat', 'series', 'split', 'join'];
 	var descriptionArray = ['Edit', 'Sort', 'Duplicates', 'Set Theory', 'Compare'];
 	var buttonIdArray = (level == 'top')
 		? ['idButtonEdit', 'idButtonSort', 'idButtonDuplicates', 'idButtonSetTheory', 'idButtonCompare']
-		: ['idButtonTrim', 'idButtonCase', 'idButtonRepeat', 'idButtonSeries', 'idButtonSplit', 'idButtonJoin'];
+		: ['idButtonTrim', 'idButtonCases', 'idButtonRepeat', 'idButtonSeries', 'idButtonSplit', 'idButtonJoin'];
 	var areaIdArray = (level == 'top')
 		? ['idEditArea', 'idSortArea', 'idDuplicatesArea', 'idSetTheoryArea', 'idCompareArea']
-		: ['idTrimArea', 'idCaseArea', 'idRepeatArea', 'idSeriesArea', 'idSplitArea', 'idJoinArea'];
+		: ['idTrimArea', 'idCasesArea', 'idRepeatArea', 'idSeriesArea', 'idSplitArea', 'idJoinArea'];
 	var pos = areaArray.indexOf(area);
 	if (type == 'allAreaIds') {
 		return areaIdArray;
@@ -434,7 +434,7 @@ function calcBreadcrumbs(area) { // ### unused
 
 function selectAreaButton(level, area) {
 	// level: 'top', 'sub'
-	// area: 'edit', 'sort', 'duplicates', 'set theory', 'compare',   'trim', 'case', 'repeat', 'series', 'split', 'join'
+	// area: 'edit', 'sort', 'duplicates', 'setTheory', 'compare',   'trim', 'cases', 'repeat', 'series', 'split', 'join'
 	const className = {
 		top: 'pressedActionTopButton',
 		sub: 'pressedActionSubButton'
@@ -493,7 +493,7 @@ function onchangeJoinOptions() {
 }
 
 function onchangeSetTheoryOptions() {
-	showInOutCheckboxes('set theory');
+	showInOutCheckboxes('setTheory');
 	updateListNameIcon(true);
 }
 
@@ -505,7 +505,7 @@ function getInOutAmountsObjPropertyName(areaTop) {
 	if (propertyName == 'edit_join') {
 		propertyName = document.querySelectorAll('input[name="JoinOptions"]:checked')[0].id.substring(2);
 	}
-	if (areaTop == 'set theory') {
+	if (areaTop == 'setTheory') {
 		propertyName = document.querySelectorAll('input[name="SetTheoryOptions"]:checked')[0].id.substring(2);
 	}
 	return propertyName;
@@ -667,7 +667,7 @@ function getProgressiveNumberString(type, end) {
 }
 
 function showInOutCheckboxes(areaTop) {
-	// areaTop: 'edit', 'sort', 'duplicates', 'set theory', 'compare'
+	// areaTop: 'edit', 'sort', 'duplicates', 'setTheory', 'compare'
 	var typeArray = ['Input', 'Output'];
 	var ioaPropertyName = getInOutAmountsObjPropertyName(areaTop);
 	var requiredAmounts = InOutAmounts[ioaPropertyName].split('_');
@@ -698,6 +698,8 @@ function goButton(area) {
 		var typeArray = ['Input', 'Output'];
 		var nodeList;
 		var idPartsArray = [];
+		var functionName = area;
+		functionName = (area == 'edit') ? activeSubButton : functionName;
 		// fill InOutArray with checked Input / Output radios
 		for (let i = 0; i < typeArray.length; i++) {
 			InOutArray[i] = [];
@@ -711,42 +713,8 @@ function goButton(area) {
 				}
 			}
 		}
-		switch (area) {
-			case 'edit':
-				switch (activeSubButton) {
-					case 'trim':
-						trim(InOutArray[0], InOutArray[1]);
-						break;
-					case 'case':
-						cases(InOutArray[0], InOutArray[1]);
-						break;
-					case 'repeat':
-						repeat(InOutArray[0], InOutArray[1]);
-						break;
-					case 'series':
-						series(InOutArray[0], InOutArray[1]);
-						break;
-					case 'split':
-						split(InOutArray[0], InOutArray[1]);
-						break;
-					case 'join':
-						join(InOutArray[0], InOutArray[1]);
-						break;
-				}
-				break;
-			case 'sort':
-				sort(InOutArray[0], InOutArray[1]);
-				break;
-			case 'duplicates':
-				searchDuplicates(InOutArray[0], InOutArray[1]);
-				break;
-			case 'set theory':
-				setTheory(InOutArray[0], InOutArray[1]);
-				break;
-			case 'compare':
-				compare(InOutArray[0], InOutArray[1]);
-				break;
-		}
+		// call the specialist function
+		window[functionName](InOutArray[0], InOutArray[1]);
 	}
 }
 
@@ -808,21 +776,21 @@ function isLetterOrHighChar(char) {
 function cases(inArray, outArray) {
 	var inputStr = document.getElementById(inArray[0]).value;
 	var outputStr = '';
-	if (document.getElementById('idCaseLower').checked == false 
-		&& document.getElementById('idCaseUpper').checked == false
-		&& document.getElementById('idCaseProper').checked == false) { // no option selected
+	if (document.getElementById('idCasesLower').checked == false 
+		&& document.getElementById('idCasesUpper').checked == false
+		&& document.getElementById('idCasesProper').checked == false) { // no option selected
 		alert('Please select an option.');
 	} // no option selected
 	
-	if (document.getElementById('idCaseLower').checked) {
+	if (document.getElementById('idCasesLower').checked) {
 		outputStr = inputStr.toLowerCase();
 	}
 	
-	if (document.getElementById('idCaseUpper').checked) {
+	if (document.getElementById('idCasesUpper').checked) {
 		outputStr = inputStr.toUpperCase();
 	}
 	
-	if (document.getElementById('idCaseProper').checked) {
+	if (document.getElementById('idCasesProper').checked) {
 		for (let i = 0; i < inputStr.length; i++ ) { // loop through list
 			if (i == 0) {
 				outputStr = outputStr + (inputStr.charAt(i)).toUpperCase();
@@ -1154,7 +1122,7 @@ function sort(inArray, outArray) {
 	countLines(outArray.join('_'));
 } // function sort
 
-function searchDuplicates(inArray, outArray) {
+function duplicates(inArray, outArray) {
 	var ListAArray = document.getElementById(inArray[0]).value.split('\n');
 	var onlySingles = document.getElementById('duplicatesOnlySingles').checked;
 	var len = ListAArray.length;
@@ -1178,7 +1146,7 @@ function searchDuplicates(inArray, outArray) {
 	document.getElementById(outArray[0]).value = UniqueList.join('\n');
 	document.getElementById(outArray[1]).value = DuplicatesList.join('\n');
 	countLinesX(outArray.join('_'));
-} // function searchDuplicates
+} // function duplicates
 
 function setTheory(inArray, outArray) {
 	// Schnittmenge _ intersection of A and B
