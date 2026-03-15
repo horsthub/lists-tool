@@ -8,9 +8,7 @@
 </head>
 
 <body onload="init()">
-<!-- hidden + empty Help Popups -->
-<div id="HelpShadow" style="position: absolute; visibility: hidden; top:0px; left: 0px;"></div>
-<div id="HelpPopup" style="position: absolute; font: Arial, sans-serif; background:#FFFFFF; visibility: hidden; top:100px; left: 150px;"></div>
+<dialog id="dialog" class="dialog"></dialog>
 <!-- Title -->
 <h3 class="Header">Lists Tool</h3>
 <!-- Default Input Lists -->
@@ -22,10 +20,7 @@
       </div>
     </div>
     <div class="td">
-      <a href="javascript:openListMenu('Input')" class="boldNoUnderline">&#128736;</a> <!-- &#128736; 🛠 -->
-      <div id="idRelativeDivInput" class="listMenuRelative">
-        <!-- is filled by openListMenu() -->
-      </div>
+      <a id="custInput" href="javascript:openListMenu('Input')" class="boldNoUnderline">&#128736;</a> <!-- &#128736; 🛠 -->
     </div>
   </div>
 </div>
@@ -150,10 +145,7 @@
       </div>
     </div>
     <div class="td">
-      <a href="javascript:openListMenu('Output')" class="boldNoUnderline">&#128736;</a> <!-- &#128736; 🛠 -->
-      <div id="idRelativeDivOutput" class="listMenuRelative">
-        <!-- is filled by openListMenu() -->
-      </div>
+      <a id="custOutput" href="javascript:openListMenu('Output')" class="boldNoUnderline">&#128736;</a> <!-- &#128736; 🛠 -->
     </div>
   </div>
 </div>

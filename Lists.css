@@ -3,6 +3,12 @@ body{
 	padding-left: 20px;
 }
 
+dialog {
+	padding-left: 1.5em;
+	padding-right: 1.5em;
+	border-width: 0.1em;
+}
+
 .Header {
 	margin-top: 5px;
 	margin-bottom: 30px;
@@ -41,15 +47,6 @@ table.b1b{
 	border: 1px solid black;
 }
 
-.HelpShadow {
-    display: block;
-    /* width: 400px; */ /* -> dynamical */
-    /* height: 400px; */ /* -> dynamical */
-	background-color: black;
-	opacity: 0.5;
-	/* text-decoration: none; */
-}
-
 div.table {
 	display: table;
 	/* border-collapse: collapse; */
@@ -85,22 +82,6 @@ input[type="text"].Descr {
 .littleCentered {
 	width: 3em;
 	text-align: center;
-}
-
-.listMenuRelative {
-	position: relative;
-	width: 1.5em;
-	/* border: 1px solid blue; */ /* used for troubleshooting */
-}
-
-.listMenuAbsolute {
-	position: absolute;
-	width: 13em;
-	right: 0;
-	background-color: white;
-	border: 1px solid black;
-	padding-left: 0.5em;
-	padding-bottom: 0.5em;
 }
 
 input[type=number] {

@@ -23,8 +23,6 @@ const InOutAmounts = {
 	compare: '2_0',
 	compareDetails: '2_2'
 };
-var helpStatusActive = false;  // needed to close with ESC
-var listMenuStatus = ''; // '', 'Input', 'Output' // needed to close with ESC
 var activeSubButton = ''; // '', 'trim', 'cases', 'repeat', 'series', 'split', 'join'
 
 function init() {
@@ -32,20 +30,37 @@ function init() {
 	tableEdit('Output', 'init');
 	onchangeCheckedLeadingZeros();
 	document.getElementById('idEditJoinOneList').checked = true;
+	document.getElementById('dialog').addEventListener("click", closeDialogBackdrop);
 }
 
-function showDialog(text) {
-	var w = window.innerWidth;
-	var h = window.innerHeight;
-	var shadowHtml = '<a href="javascript:closeHelp()" class="HelpShadow" style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
-	var tableStart = '<table class="b1b"><tr><td> &nbsp; &nbsp; </td><td>'
-	var tableEnd = '</td><td> &nbsp; &nbsp; </td></tr></table>'
-	var closeButton = '<div style="text-align: right;"> <a href="javascript:closeHelp()" style="text-decoration: none"> &nbsp; &nbsp; x &nbsp; &nbsp; </a> </div>';
-	document.getElementById('HelpShadow').innerHTML = shadowHtml;
-	document.getElementById('HelpShadow').style.visibility = 'visible';
-	document.getElementById('HelpPopup').innerHTML = tableStart + closeButton + text + tableEnd;
-	document.getElementById('HelpPopup').style.visibility = 'visible';
-	helpStatusActive = true;
+function closeDialogBackdrop(event) {
+	const dialogDimensions = document.getElementById('dialog').getBoundingClientRect()
+	if (	event.clientX < dialogDimensions.left ||
+			event.clientX > dialogDimensions.right ||
+			event.clientY < dialogDimensions.top ||
+			event.clientY > dialogDimensions.bottom ) {
+		document.getElementById('dialog').close()
+	}
+}
+
+function showDialog(text, anchorType) {
+	// anchorType: 'Input', 'Output'
+	var dialog = document.getElementById('dialog')
+	var closeButton = '<div style="text-align: right;"> <a href="javascript:closeDialog()" style="text-decoration: none"> &times; </a> </div>';
+	dialog.innerHTML = closeButton + text;
+	dialog.showModal();
+	if (anchorType == '') {
+		dialog.style.margin = 'auto';
+		dialog.style.position = 'fixed';
+		dialog.style.left = '0';
+		dialog.style.top = '0';
+	} else {
+		var anchor = document.getElementById('cust' + anchorType);
+		dialog.style.margin = 'unset';
+		dialog.style.position = 'absolute';
+		dialog.style.left = (anchor.offsetLeft + anchor.offsetWidth - dialog.offsetWidth) + 'px';
+		dialog.style.top = (anchor.offsetTop + anchor.offsetHeight ) + 'px';
+	}
 } // function showDialog
 
 function showHelp(helpType) {
@@ -193,27 +208,12 @@ function showHelp(helpType) {
 			var helpBody = '¤¤¤ ¤¤¤';
 			break;
 	}
-	showDialog('<b>' + helpHeader + '</b><br><br>' + helpBody);
-	helpStatusActive = true;
+	showDialog('<b>' + helpHeader + '</b><br><br>' + helpBody, '');
 }  // function showHelp
 
-function closeHelp() {
-	document.getElementById('HelpShadow').style.visibility = 'hidden';
-	document.getElementById('HelpShadow').innerHTML = '';
-	document.getElementById('HelpPopup').style.visibility = 'hidden';
-	document.getElementById('HelpPopup').innerHTML = '';
-	helpStatusActive = false;
-}  // function closeHelp
-
-document.onkeydown = function(evt) {
-	if (evt.keyCode == 27) { // ESC-Key
-		if (helpStatusActive) {
-			closeHelp();
-		} else if (listMenuStatus != '') {
-			closeListMenu(listMenuStatus);
-		}
-    }
-}; // event document.onkeydown
+function closeDialog() {
+	document.getElementById('dialog').close();
+}  // function closeDialog
 
 function showMessage(msgText) {
 	var msgCode = '<br><div class="msgBox">';
@@ -229,36 +229,16 @@ function clearMessage() {
 
 function openListMenu(table) {
 	// table: 'Input', 'Output'
-	var parameterClose = "'" + table + "'";
 	var parameterAdd = "'" + table + "', 'add'";
 	var parameterCol = "'" + table + "', 'col'";
-	var w = window.innerWidth;
-    var h = window.innerHeight;
-	var shadowHtml = '<a href="javascript:closeListMenu(' + parameterClose + ')" class="HelpShadow" ';
-	shadowHtml += 'style="width: ' + w + 'px; height: ' + h + 'px;"></a>';
-	document.getElementById('HelpShadow').innerHTML = shadowHtml;
-	document.getElementById('HelpShadow').style.visibility = 'visible';
 	var col = cellAmountObj[table + 'Col'];
 	var cells = cellAmountObj[table];
 	var menuHtml = '';
-	menuHtml += '<div class="listMenuAbsolute">';
-	menuHtml += '  <div style="text-align: right;">';
-	menuHtml += '	<a href="javascript:closeListMenu(' + parameterClose + ')" style="text-decoration: none"> &nbsp; &nbsp; x &nbsp; &nbsp; </a>';
-	menuHtml += '  </div>';
-	menuHtml += '  <button onclick="tableEdit(' + parameterAdd + ')">Add list field</button><br><br>';
-	menuHtml += '  Lists in <input type="number" id="idCol' + table + '" value="' + col + '" min="0" max="' + cells + '"> columns';
-	menuHtml += '  (0: all in one line)<br>';
-	menuHtml += '  <button onclick="tableEdit(' + parameterCol + ')">Arrange</button>';
-	menuHtml += '</div>';
-	document.getElementById('idRelativeDiv' + table).innerHTML = menuHtml;
-	listMenuStatus = table;
-}
-
-function closeListMenu(table){
-	document.getElementById('HelpShadow').style.visibility = 'hidden';
-	document.getElementById('HelpShadow').innerHTML = '';
-	document.getElementById('idRelativeDiv' + table).innerHTML = '';
-	listMenuStatus = '';
+	menuHtml += '<button onclick="tableEdit(' + parameterAdd + ')">Add list field</button><br><br>';
+	menuHtml += 'Lists in <input type="number" id="idCol' + table + '" value="' + col + '" min="0" max="' + cells + '"> columns<br>';
+	menuHtml += '(0: all in one line)<br>';
+	menuHtml += '<button onclick="tableEdit(' + parameterCol + ')">Arrange</button>';
+	showDialog(menuHtml, table);
 }
 
 function clearList(cellId) {
@@ -312,7 +292,7 @@ function getRowTagByColAndCellAndTotal(tag, col, cell, total) {
 		}
 	}
 }
-  
+
 function tableEdit(table, operation) {
 	// table: 'Input', 'Output'
 	// operation: 'init', 'add', 'col'
@@ -327,7 +307,7 @@ function tableEdit(table, operation) {
 	}
 	var col = cellAmountObj[table + 'Col'];
 	var listValues = [];
-	var listDescr = [];  
+	var listDescr = [];
 	// save data
 	if (operation != 'init') {
 		for (let i=1; i<=cellAmountOld; i++) {
@@ -347,7 +327,7 @@ function tableEdit(table, operation) {
 		// cell with fields and values
 		code +='<div class="td">';
 		code += '<a href="javascript:clearList(' + cellParameter + ')" class="blackNoUnderline">';
-		code +=  '<span id="idCellName' + cellID + '">List</span> ' + cellName;
+		code += '  <span id="idCellName' + cellID + '">List</span> ' + cellName;
 		code += '</a>';
 		code += '<input type="text" id="Descr' + cellID + '" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
 		code += '<span id=CounterList' + cellID + '></span> <br />';
@@ -366,7 +346,7 @@ function tableEdit(table, operation) {
 		document.getElementById('List'+cellID).value = listValues[i];
 		document.getElementById('Descr'+cellID).value = listDescr[i];
 		}
-		closeListMenu(table);
+		closeDialog(table);
 	}
 	// count lines
 	for (let i=1; i<=cellAmountNew; i++) {
@@ -389,7 +369,7 @@ function tableEdit(table, operation) {
 		updateListNameIcon(true);
 	}
 }
-  
+
 function getArea(level, area, type) {
 	// level: 'top', 'sub'
 	var areaArray = (level == 'top')
@@ -593,7 +573,7 @@ function updateListNameIcon(showIcons) {
 	}
 }
 
-function updateMessageAndGoButton(type, requiredAmount)  {
+function updateMessageAndGoButton(type, requiredAmount) {
 	// type: 'Input', 'Output'
 	var msg;
 	var activeGoButton = false;
@@ -658,7 +638,7 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	}
 	code += '<label id="id' + typeInOut + 'OtherLabel"' + styleHidden + '> &nbsp; &nbsp; &nbsp; ';
 	code += '  <input type="checkbox" id="id' + typeInOut + 'Other"';
-	parameter +=  ", false";
+	parameter += ", false";
 	code += '    onchange="updateCheckboxesOneLine(' + parameter + ');"> ';
 	code += (typeInOut == 'Input') ? ' output lists' : ' input lists';
 	code += '</label> &nbsp; ';
@@ -828,7 +808,7 @@ function repeat(inArray, outArray) {
 function onchangeCheckedLeadingZeros() {
 	if (document.getElementById('SeriesLeadingZero').checked) {
 		document.getElementById('SeriesZeroAmount').classList.remove('hiddenFree');
-	} else  {
+	} else {
 		document.getElementById('SeriesZeroAmount').classList.add('hiddenFree');
 	}
 }
@@ -920,7 +900,7 @@ function split(inArray, outArray) {
 					posPartStart = i + 1;
 					status = 'start';
 				} else if (status == 'unmasked') { // end of part
-					textOut += textSource.substring( posPartStart, i ) +  '\n';
+					textOut += textSource.substring( posPartStart, i ) + '\n';
 					i = i + deliLen - 1;
 					posPartStart = i + 1;
 					status = 'start';
@@ -963,7 +943,7 @@ function prepend_append(textWithLinebreaks, preText, postText) {
 	var newtextWithLinebreaks = '';
 	for (let i = 0; i < textArray.length; i++) {
 		newtextWithLinebreaks += preText + textArray[i] + postText;
-		if (i+1 <  textArray.length) {
+		if (i+1 < textArray.length) {
 			newtextWithLinebreaks += '\n';
 		}
 	}
@@ -999,7 +979,7 @@ function joinTwoLists(inArrayString, outString, leftIsLonger, usingfirsts) {
 	// outString: output list name: List*
 	// leftIsLonger: true = left list is longer, false right list is longer
 	// usingfirsts: true = take first elements of longer list, false = take last elements of longer list
-	closeHelp();	
+	closeDialog();	
 	var inArray = inArrayString.split(',');
 	var listArray1 = document.getElementById(inArray[0]).value.split('\n');
 	var listArray2 = document.getElementById(inArray[1]).value.split('\n');
@@ -1082,7 +1062,7 @@ function joinTwoListsPreCheck(inArray, outArray) {
 		code += '</li>';
 		code += '</ul>';
 		code += '<br>';
-		showDialog(code); 
+		showDialog(code, ''); 
 	}
 }
 
@@ -1120,8 +1100,8 @@ function sort(inArray, outArray) {
 	var ListAArray = document.getElementById(inArray[0]).value.split('\n');
 	if (document.getElementById('idSortAlpha').checked) { // alphabetical
 		ListAArray.sort(function(a, b){
-    		if(a.toLowerCase() < b.toLowerCase()) { return -1; }
-  			if(a.toLowerCase() > b.toLowerCase()) { return 1; }
+			if(a.toLowerCase() < b.toLowerCase()) { return -1; }
+			if(a.toLowerCase() > b.toLowerCase()) { return 1; }
 	 		return 0;
 		});
 	} else if (document.getElementById('idSortAscii').checked) { // ASCII
