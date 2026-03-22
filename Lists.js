@@ -112,7 +112,7 @@ function showHelp(helpType) {
 			helpBody += '    A text will be prepended or appended<br>';
 			helpBody += '    to each element of one list.';
 			helpBody += '  </li>';
-			helpBody += '</ul><br><br>';
+			helpBody += '</ul><br>';
 			break;
 		case 'JoinTwoPos':
 			var helpHeader = 'Join - Two Lists - Position';
@@ -157,22 +157,20 @@ function showHelp(helpType) {
 			break;			
 		case 'Duplicates':
 			var helpHeader = 'Duplicates';
-			var helpBody = '<table class="cellSpacing">';
-			helpBody += '  <tr>';
-			helpBody += '    <td colspan="4" class="cellBorder"><center><b>aa</b><br>bb<br><b>aa</b><br>cc</center></td>';
-			helpBody += '  </tr>';
-			helpBody += '  <tr>';
+			var helpBody = '<div class="help-dupli-unit">';
+			helpBody += '  <div class="help-dupli-1-item"><b>aa</b><br>bb<br><b>aa</b><br>cc</div>';
+			helpBody += '  <div class="help-dupli-2-container">';
 			// readonly does obviously not work with type=checkbox - but it works with type=text
-			helpBody += '    <td colspan="2" class="cellBorder"><center><input type="checkbox" readonly="true"> only singles</center></td>';
-			helpBody += '    <td colspan="2" class="cellBorder"><center><input type="checkbox" readonly="true" checked="checked"> only singles</center></td>';
-			helpBody += '  </tr>';
-			helpBody += '  <tr>';
-			helpBody += '    <td width="125" class="cellBorder"><center><b>aa</b><br>bb<br>cc<br><br></center>first occurance of the duplicate is in the list of the singles</td>';
-			helpBody += '    <td width="125" class="cellBorder"><center>aa<br><br><br><br></center>only the further occurance(s) of the duplicate(s)</td>';
-			helpBody += '    <td width="125" class="cellBorder"><center>bb<br>cc<br><br><br></center>only singles</td>';
-			helpBody += '    <td width="125" class="cellBorder"><center><b>aa</b><br>aa<br><br><br></center>first and further occurance(s) of the duplicate(s)</td>';
-			helpBody += '  </tr>';
-			helpBody += '</table><br>';
+			helpBody += '    <div><input type="checkbox" readonly="true"> only singles</div>';
+			helpBody += '    <div><input type="checkbox" readonly="true" checked="checked"> only singles</div>';
+			helpBody += '  </div>';
+			helpBody += '  <div class="help-dupli-4-container">';
+			helpBody += '    <div><center><b>aa</b><br>bb<br>cc<br><br></center>first occurance of the duplicate is in the list of the singles</div>';
+			helpBody += '    <div><center>aa<br><br><br><br></center>only the further occurance(s) of the duplicate(s)</div>';
+			helpBody += '    <div><center>bb<br>cc<br><br><br></center>only singles</div>';
+			helpBody += '    <div><center><b>aa</b><br>aa<br><br><br></center>first and further occurance(s) of the duplicate(s)</div>';
+			helpBody += '  </div>';
+			helpBody += '</div><br>';
 			break;
 		case 'SetTheory':
 			var helpHeader = 'Set Theory';

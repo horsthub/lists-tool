@@ -89,16 +89,6 @@ input[type=number] {
 	text-align: center;
 }
 
-.cellSpacing {
-	border-spacing: 0.5em;
-}
-
-.cellBorder {
-	border: 0.1em solid lightgray;
-	padding: 0.5em;
-	vertical-align: top;
-}
-
 .msgBox {
 	border: 1px solid black; 
 	width: 650px;
@@ -121,4 +111,29 @@ input[type=number] {
 	border: 0.1em solid lightgray;
 	width: 3em;
 	padding-left: 0.5em;
+}
+
+.help-dupli-unit {
+	width: 37.5em;
+}
+.help-dupli-1-item {
+	border: 0.1em solid lightgray;
+	padding: 0.5em;
+	text-align: center;
+}
+.help-dupli-2-container, .help-dupli-4-container {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 0.5em;
+}
+.help-dupli-2-container div {
+	width: 17.3em;
+	border: 0.1em solid lightgray;
+	padding: 0.5em;
+	text-align: center;
+}
+.help-dupli-4-container div {
+	width: 7.8em;
+	border: 0.1em solid lightgray;
+	padding: 0.5em;
 }
