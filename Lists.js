@@ -323,26 +323,45 @@ function tableEdit(table, operation) {
 		// start of row
 		code += getRowTagByColAndCellAndTotal('start', col, i, cellAmountNew);
 		// cell with fields and values
-		code +='<div class="td">';
-		code += '<a href="javascript:clearList(' + cellParameter + ')" class="blackNoUnderline">';
-		code += '  <span id="idCellName' + cellID + '">List</span> ' + cellName;
-		code += '</a>';
-		code += '<input type="text" id="Descr' + cellID + '" class="Descr"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ';
-		code += '<span id=CounterList' + cellID + '></span> <br />';
-		code += '<textarea id="List' + cellID + '" cols="38" rows="10"';
-		code += '  onkeyup="countLines(' + cellParameter + ')" onchange="countLines(' + cellParameter + ')">';
-		code += '</textarea> &nbsp; &nbsp; <br />';
-		code +='</div>'; 
+		code += '<div class="td">';
+		code += '  <div class="flex-container wrap clip">';
+		code += '    <div class="flex-item no-line-wrap">';
+		code += '      <a href="javascript:clearList(' + cellParameter + ')" class="blackNoUnderline">';
+		code += '        <span id="idCellName' + cellID + '">List</span>&nbsp;' + cellName;
+		code += '      </a>';
+		code += '    </div>';
+		code += '    <div class="flex-item flex-grow no-line-wrap">';
+		code += '      <input type="text" id="Descr' + cellID + '" class="Descr" size="1">';
+		code += '    </div>';
+		code += '    <div class="flex-item">';
+		code += '      <span id=CounterList' + cellID + '></span>';
+		code += '    </div>';
+		code += '  </div>';
+		code += '  <textarea id="List' + cellID + '" cols="38" rows="10"';
+		code += '    onkeyup="countLines(' + cellParameter + ')" onchange="countLines(' + cellParameter + ')">';
+		code +=   '</textarea>';
+		code += '</div>';
+		// cell as spacer between side by side lists
+		code += '<div class="td">&nbsp;&nbsp;&nbsp;</div>';
 		// end of row
 		code += getRowTagByColAndCellAndTotal('end', col, i, cellAmountNew);
 	}
 	document.getElementById(tableName).innerHTML = code;
 	// restore data // if restore is done within building the table, there are issues with ending html tags
-	if (operation != 'init') {
+	if (operation == 'init') {
+		for (let i=1; i<=cellAmountNew; i++) {
+			let cellID = (table == 'Input') ? getCellName(table, i) : i;
+			document.getElementById('Descr'+cellID).value = '...';
+		}
+	}  else {
+		if (operation == 'add') {
+			let cellID = (table == 'Input') ? getCellName(table, cellAmountNew) : cellAmountNew;
+			document.getElementById('Descr'+cellID).value = '...';
+		}
 		for (let i=1; i<=cellAmountOld; i++) {
-		let cellID = (table == 'Input') ? getCellName(table, i) : i;
-		document.getElementById('List'+cellID).value = listValues[i];
-		document.getElementById('Descr'+cellID).value = listDescr[i];
+			let cellID = (table == 'Input') ? getCellName(table, i) : i;
+			document.getElementById('List'+cellID).value = listValues[i];
+			document.getElementById('Descr'+cellID).value = listDescr[i];
 		}
 		closeDialog(table);
 	}
@@ -712,7 +731,7 @@ function countLines(fieldId) {
 	} else {
 		counter = document.getElementById(fieldId).value.split('\n').length;
 	}
-	document.getElementById('Counter' + fieldId).innerHTML = counter + ' lines';
+	document.getElementById('Counter' + fieldId).innerHTML = counter + '&nbsp;lines';
 	return counter;
 } // function countLines
 

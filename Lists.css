@@ -49,8 +49,6 @@ table.b1b{
 
 div.table {
 	display: table;
-	/* border-collapse: collapse; */
-	/* border: 1px solid blue; */ /* used for troubleshooting */
 }
 
 div.tr {
@@ -59,8 +57,29 @@ div.tr {
 
 div.td {
 	display: table-cell;
-	border: 1;
-	/* border: 1px solid red; */ /* used for troubleshooting */
+}
+
+.flex-container {
+	display: flex;
+}
+
+.wrap {
+	flex-wrap: wrap;
+	container-type: inline-size;
+}
+
+.clip {
+	overflow: clip;
+}
+
+.no-line-wrap {
+	white-space: nowrap;
+}
+
+.flex-grow {
+	flex-grow: 1;
+	border-left: 0.2em solid white;
+	border-right: 0.2em solid white;
 }
 
 .ButtonAsText{
@@ -75,8 +94,9 @@ div.td {
 }
 
 input[type="text"].Descr {
-    width: 100px;
-    border: 0px /* 1px solid #ff0000 */
+    width: 100%;
+    border-width: 0;
+    box-sizing: border-box;
 }
 
 .littleCentered {
