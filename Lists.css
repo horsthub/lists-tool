@@ -9,6 +9,10 @@ dialog {
 	border-width: 0.1em;
 }
 
+input[type='radio'], input[type='checkbox'] {
+    accent-color: dimgray; /* filter: grayscale(1); */
+}
+
 .Header {
 	margin-top: 5px;
 	margin-bottom: 30px;

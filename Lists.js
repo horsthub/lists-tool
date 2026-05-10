@@ -635,7 +635,7 @@ function getInOutCheckboxes(typeInOut, requiredAmount, tickedIdString, short) {
 	var code = '';
 	var styleHidden = '';
 	if (requiredAmount == 0) {
-		code += '---';
+		code += '&nbsp;---';
 		styleHidden = ' style="visibility: hidden"';
 	}
 	for (let j=0; j<typeArray.length; j++) {
