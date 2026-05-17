@@ -1123,7 +1123,9 @@ function sort(inArray, outArray) {
 		});
 	} else if (document.getElementById('idSortAscii').checked) { // ASCII
 		ListAArray.sort();
-	} // ASCII
+	} else if (document.getElementById('idSortReverseList').checked) { // reverse listing
+		ListAArray.reverse();
+	}
 	document.getElementById(outArray[0]).value = ListAArray.join('\n');
 	countLines(outArray.join('_'));
 } // function sort
