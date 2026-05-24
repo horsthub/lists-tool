@@ -1125,6 +1125,10 @@ function sort(inArray, outArray) {
 		ListAArray.sort();
 	} else if (document.getElementById('idSortReverseList').checked) { // reverse listing
 		ListAArray.reverse();
+	} else if (document.getElementById('idSortReverseLineChar').checked) { // reverse line characters
+		for (let i = 0; i < ListAArray.length; i++) {
+			ListAArray[i] = ListAArray[i].split('').reverse().join('');
+		}
 	}
 	document.getElementById(outArray[0]).value = ListAArray.join('\n');
 	countLines(outArray.join('_'));
